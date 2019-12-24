@@ -1,10 +1,35 @@
 const express = require('express');
+const bodyParser = require('body-parser');
+const path = require('path');
 const app = express();
 const port = 3000;
 
+// The code bellow is how you write a custome middleware
+/*
+const logger = (req, res, next) =>{
+    console.log("Logging...");
+    next();
+}
+
+app.use(logger);
+*/
+
+// set view engine
+app.set('view engine', 'ejs');
+app.set('views', path.join(__dirname, 'views'));
+
+// body-parser Middleware
+app.use(bodyParser.json());
+app.use(bodyParser.urlencoded({ extended: false }));
+
+//express middleware - set Sastic path
+app.use(express.static(path.join(__dirname, 'public')));
+
 // app.get('/', (req, res) => res.send('Hello World!'))
-app.get("/", (req, res) => {
-    res.send("test.html");
+app.get('/', (req, res) => {
+    res.render('indexa',{
+        title:'Customers'
+    });
 });
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
