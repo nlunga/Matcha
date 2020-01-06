@@ -3,7 +3,14 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const app = express();
 const port = 3000;
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://localhost:27017/users";
 
+MongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    console.log("Database created!");
+    db.close();
+});
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -32,9 +39,17 @@ app.use(express.static(path.join(__dirname, 'public')));
 // app.get('/', (req, res) => res.send('Hello World!'))
 app.get('/', (req, res) => {
     res.render('pages/index',{
-        title:'Customers'
+        title:'Customers',
+        headed: 'Home'
     });
 });
+
+app.get('/api', (req, res) => {
+    res.render('pages/test', {
+        headed: 'Api'
+    });
+});
+
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
