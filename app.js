@@ -1,16 +1,23 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+// const mongo = require('mongodb');
 const app = express();
 const port = 3000;
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/users";
 
-MongoClient.connect(url, (err, db) => {
-    if (err) throw err;
-    console.log("Database created!");
-    db.close();
-});
+//////////////////////////////////////////////////
+/// DATABASE CREATITION
+const MongoClient = require('mongodb').MongoClient;
+const url = "mongodb://localhost:27017/Matcha";
+
+// MongoClient.connect(url, (err, db) => {
+//     if (err) throw err;
+//     console.log("Database created!");
+//     const collection = db.collection('users');
+//     const user = {}
+//     db.close();
+// });
+////////////////////////////////////////////////
 
 // set the view engine to ejs
 app.set('view engine', 'ejs');
@@ -33,23 +40,33 @@ app.use(logger);
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 
+
 //express middleware - set Sastic path
 app.use(express.static(path.join(__dirname, 'public')));
 
-// app.get('/', (req, res) => res.send('Hello World!'))
+///////////////////////////////////////////////////////
+///// IMPORT ROUTES
+const getRoutes = require('./routes/api');
+app.use('/api', getRoutes);
+
 app.get('/', (req, res) => {
+    // console.log(req.body);
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home'
     });
 });
 
-app.get('/api', (req, res) => {
-    res.render('pages/test', {
-        headed: 'Api'
-    });
-});
+// app.post('/index', (req, res) => {
+//     console.log(req.body);
+//     res.render('pages/register-success', {
+//         headed: "Registration",
+//         data: req.body
+//     });
+// });
 
+const postRoutes = require('./routes/posts');
+app.use('/index', postRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
