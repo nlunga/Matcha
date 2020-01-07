@@ -1,6 +1,7 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
+const joi = require('joi');
 // const mongo = require('mongodb');
 const app = express();
 const port = 3000;
@@ -57,16 +58,8 @@ app.get('/', (req, res) => {
     });
 });
 
-// app.post('/index', (req, res) => {
-//     console.log(req.body);
-//     res.render('pages/register-success', {
-//         headed: "Registration",
-//         data: req.body
-//     });
-// });
-
 const postRoutes = require('./routes/posts');
-app.use('/index', postRoutes);
+app .use('/index', postRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
