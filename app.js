@@ -9,15 +9,25 @@ const port = 3000;
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
 const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/Matcha";
+const url = "mongodb://localhost:27017/Aphrodite";
 
-// MongoClient.connect(url, (err, db) => {
-//     if (err) throw err;
-//     console.log("Database created!");
-//     const collection = db.collection('users');
-//     const user = {}
-//     db.close();
-// });
+MongoClient.connect(url, (err, db) => {
+    if (err) throw err;
+    console.log("Database created!");
+    db.close();
+}); 
+
+////////////////////////////////////////////////
+/// CREATING A COLLECTION
+MongoClient.connect('mongodb://localhost:27017/', (err, db) => {
+    if (err) throw err;
+    const dbo = db.db('Aphrodite');
+    dbo.createCollection('users', (err, res) => {
+        if (err) throw err;
+        console.log('users Collection Created');
+        db.close();
+    });
+});
 ////////////////////////////////////////////////
 
 // set the view engine to ejs
