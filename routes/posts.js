@@ -18,20 +18,29 @@ router.post('/', (req, res) => {
             console.log(err);
         }else {
             MongoClient.connect(url, (err, db) => {
-                if (err) throw err;
+                if (err) return console.log(err);
                 const dbo = db.db('Aphrodite');
                 const mydata = {username: req.body.username, email: req.body.email, password: req.body.password};
-                dbo.collection('users').insertOne(mydata, (err, res) => {
-                    if (err) throw err;
-                    console.log('1 document inserted');
-                    db.close();
+                dbo.collection('users').findOne({ username: req.body.username}, (err, result) => {
+                    if (err) return console.log(err);
+                    // console.log(result);
+                    if (result.username === req.body.username) {
+                        console.log('username already exists');
+                    }else{
+                        dbo.collection('users').insertOne(mydata, (err, res) => {
+                            if (err) return console.log(err);
+                            console.log('1 document inserted');
+                            db.close();
+                        });
+
+                        res.render('pages/register-success', {
+                            headed: "Registration",
+                            data: req.body
+                        });
+                    }
                 });
             });
-            res.render('pages/register-success', {
-                headed: "Registration",
-                data: req.body
-            });
-            console.log(data);
+            // console.log(data);
         }
     });
 });
