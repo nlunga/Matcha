@@ -1,6 +1,10 @@
 <%- include('../partials/header');%>
 <h1><%= title %></h1>
 <form action="/index" method="POST">
+    <label for="firstName">First Name: </label>
+    <input type="text" name="firstName" id="firstName" placeholder="First Name" value=""><br>
+    <label for="lastName">Last Name: </label>
+    <input type="text" name="lastName" id="lastName" placeholder="Last Name" value=""><br>
     <label for="usename">Username: </label>
     <input type="text" name="username" id="username" placeholder="username" value=""><br>
     <label for="email">Email: </label>
