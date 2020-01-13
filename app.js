@@ -68,8 +68,16 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/signup', (req, res) => {
+    // console.log(req.body);
+    res.render('pages/signup',{
+        title:'Customers',
+        headed: 'Home'
+    });
+});
+
 const postRoutes = require('./routes/posts');
-app .use('/index', postRoutes);
+app .use('/signup', postRoutes);
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
