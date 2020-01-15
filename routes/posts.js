@@ -13,7 +13,7 @@ router.post('/', (req, res) => {
         email : joi.string().trim().email().required(),
         password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
         confPass: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
-        next: joi.required()
+        signup: joi.required()
     });
     joi.validate(req.body, schema, (err, data) => {
         // console.log(data);
