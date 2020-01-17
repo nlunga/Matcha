@@ -12,6 +12,7 @@ router.post('/', (req, res) => {
             console.log(result);
             if (err) return console.log(err);
             for (i = 0; i < result.length; i++) {
+                console.log(i + result[i].username + " " + result[i].password + "\n");
                 if (result[i].username === req.body.username && result[i].password === req.body.password) {
                     console.log('\nThis is the username: ' + result[i].username + ' with its password: ' + result[i].password);
                     
