@@ -108,6 +108,13 @@ app.get('/login', (req, res) => {
     });
 });
 
+app.get('/tes', (req, res) => {
+    res.render('pages/tes', {
+        title : 'tes',
+        headed: 'tesdadada'
+    })
+});
+
 app.get('/profile', (req, res) => {
     console.log(req.url);
     res.render('pages/profile');
