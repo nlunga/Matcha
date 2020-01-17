@@ -4,7 +4,7 @@ const path = require('path');
 const joi = require('joi');
 // const mongo = require('mongodb');
 const app = express();
-const port = 3000;
+const port = 3001;
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION

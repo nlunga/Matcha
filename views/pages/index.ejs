@@ -1,14 +1,94 @@
 <%- include('../partials/header');%>
-<h1><%= title %></h1>
-<form action="/index" method="POST">
-    <label for="usename">Username: </label>
-    <input type="text" name="username" id="username" placeholder="username" value=""><br>
-    <label for="email">Email: </label>
-    <input type="email" name="email" id="email" placeholder="email" value=""><br>
-    <label for="password">Password: </label>
-    <input type="password" name="password" id="password" placeholder="password" value=""><br>
-    <label for="confPass">Confirm Password: </label>
-    <input type="password" name="confPass" id="confPass" placeholder="confirm password" value=""><br>
-    <input type="submit" name="next" value="next">
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta http-equiv="X-UA-Compatible" content="ie=edge">
+    <title>Document</title>
+</head>
+<body>
+    <h1><%= title %></h1>
+<form action="/index" method="POST" class="validation" id="validated-form">
+    <div class="row">
+        <div class="col-md-6 mb-3">
+            <!-- First Name -->
+            <label for="FirstName">First Name: </label>
+            <input id= "FirstName" type= "text" name= "FirstName"  placeholder="First name" value=""><br>
+            <div class= "invalid-feedback">
+                Valid First name is required.
+            </div>
+        </div>
+        <div class="col-md-6 mb-3">
+            <!-- Last Name -->
+            <label for="LastName">Last Name: </label>
+            <input id= "LastName" type= "text" name= "LastName" placeholder="Last name" value=""><br>
+            <div class= "invalid-feedback">
+                    Valid First name is required.
+            </div>
+        </div>
+    </div>
+    <div class="mb-3">
+        <!-- Username -->
+        <label for="usename">Username: </label>
+        <input type="text" name="username" id="username" placeholder="username" value=""><br>
+    </div>
+    <div class="mb-3">
+        <!-- Email -->
+        <label for="email">Email: </label>
+        <input type="email" name="email" id="email" placeholder="email" value=""><br>
+    </div>
+    <div class="mb-3">
+        <!-- Password -->
+        <label for="password">Password: </label>
+        <input type="password" name="password" id="password" placeholder="password" value=""><br>
+    </div>
+    <div class="mb-3">
+        <!-- Confirm Password -->
+        <label for="confPass">Confirm Password: </label>
+        <input type="password" name="confPass" id="confPass" placeholder="confirm password" value=""><br>
+    </div>
+    <div> 
+        <!-- submit button -->
+        <button class="btn btn-primary btn-lg btn-block" type="submit" name="next" value="submit" >next</button>
+    </div>
 </form>
+
+<script>
+    const vueApp = new Vue({
+        el: '#validated-form',
+        data: function(){
+        return{
+            validatedionErrors:{
+                FirstName: null,
+                LastName: null,
+                username: null,
+                email: null,
+                password: null,
+                confPass: null
+            }
+        }},
+        methods:{
+            subitFrom () {
+                if(this.validateFrom()){
+                    alert('From Submitted');
+                    // submit form to backend
+                }
+            },
+            validateFrom(){
+                var formId = 'validated-form';
+                var nodes = document.querySelectorAll('#${formId} :invalid');
+                var errorObjectName = 'ValidationErrors';
+                var vm = this;
+
+                Object.keys(this[errorObjectName]).forEach(key =>{
+                    this[errorObjectName][key] = null
+                });
+            
+            }
+        }
+    });
+</script>
 <%- include('../partials/footer');%>
+</body>
+</html>
