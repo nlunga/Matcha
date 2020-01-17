@@ -2,6 +2,7 @@ const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
 const joi = require('joi');
+const session = require('express-session');
 // const mongo = require('mongodb');
 const app = express();
 const port = 3001;
@@ -30,30 +31,45 @@ MongoClient.connect('mongodb://localhost:27017/', (err, db) => {
 });
 ////////////////////////////////////////////////
 
+///////////////////////////////////////////////
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
+///////////////////////////////////////////////
 
-// use res.render to load up an ejs view file
+///////////////////////////////////////////////
+//// SETTING UP A COOKIE
+app.set('trust proxy', 1); // trust first proxy
+app.use(session({
+  secret: 'keyboard cat',
+  resave: false,
+  saveUninitialized: true,
+  cookie: { secure: true }
+}));
+//////////////////////////////////////////////
 
-
+///////////////////////////////////////////////
 // The code bellow is how you write a custome middleware
 /*
 const logger = (req, res, next) =>{
     console.log("Logging...");
     next();
 }
+///////////////////////////////////////////////
 
 app.use(logger);
 */
 
+//////////////////////////////////////////////
 // body-parser Middleware
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
+//////////////////////////////////////////////
 
-
+//////////////////////////////////////////////
 //express middleware - set Sastic path
 app.use(express.static(path.join(__dirname, 'public')));
+//////////////////////////////////////////////
 
 ///////////////////////////////////////////////////////
 ///// IMPORT ROUTES
@@ -68,8 +84,40 @@ app.get('/', (req, res) => {
     });
 });
 
+app.get('/index', (req, res) => {
+    // console.log(req.body);
+    res.render('pages/index',{
+        title:'Customers',
+        headed: 'Home'
+    });
+});
+
+app.get('/signup', (req, res) => {
+    // console.log(req.body);
+    res.render('pages/signup',{
+        title:'Register an account',
+        headed: 'Sign Up'
+    });
+});
+
+app.get('/login', (req, res) => {
+    // console.log(req.body);
+    res.render('pages/login',{
+        title:'login',
+        headed: 'Login'
+    });
+});
+
+app.get('/profile', (req, res) => {
+    console.log(req.url);
+    res.render('pages/profile');
+});
+
 const postRoutes = require('./routes/posts');
-app .use('/index', postRoutes);
+app.use('/signup', postRoutes);
+
+const loginRoute = require('./routes/login');
+app.use('/login', loginRoute)
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
