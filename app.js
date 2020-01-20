@@ -108,10 +108,10 @@ app.get('/login', (req, res) => {
     });
 });
 
-app.get('/tes', (req, res) => {
-    res.render('pages/tes', {
-        title : 'tes',
-        headed: 'tesdadada'
+app.get('/forgot_password', (req, res) => {
+    res.render('pages/forgot_password', {
+        title : 'Forgot Password',
+        headed: 'Forgot Password'
     })
 });
 
