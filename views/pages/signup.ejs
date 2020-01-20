@@ -1,19 +1,24 @@
 <%- include('../partials/header');%>
 <h1><%= title %></h1>
-<form action="/signup" method="POST">
-    <label for="firstName">First Name: </label>
-    <input type="text" name="firstName" id="firstName" placeholder="First Name" value=""><br>
-    <label for="lastName">Last Name: </label>
-    <input type="text" name="lastName" id="lastName" placeholder="Last Name" value=""><br>
-    <label for="usename">Username: </label>
-    <input type="text" name="username" id="username" placeholder="username" value=""><br>
-    <label for="email">Email: </label>
-    <input type="email" name="email" id="email" placeholder="email" value=""><br>
-    <label for="password">Password: </label>
-    <input type="password" name="password" id="password" placeholder="password" value=""><br>
-    <label for="confPass">Confirm Password: </label>
-    <input type="password" name="confPass" id="confPass" placeholder="confirm password" value=""><br>
-    <input type="submit" name="signup" value="signup">
-</form>
+<div>
+    <form action="/signup" method="POST">
+        <div class="container">
+            <label for="firstName">First Name</label>
+            <input type="text" name="firstName" id="firstName" placeholder="Enter your First Name" value="">
+            <label for="lastName">Last Name</label>
+            <input type="text" name="lastName" id="lastName" placeholder="Enter your Last Name" value="">
+            <label for="usename">Username</label>
+            <input type="text" name="username" id="username" placeholder="Enter a username" value="">
+            <label for="email">Email</label>
+            <input type="email" name="email" id="email" placeholder="Enter your email address" value="">
+            <label for="password">Password</label>
+            <input type="password" name="password" id="password" placeholder="Enter your password" value="">
+            <label for="confPass">Confirm Password </label>
+            <input type="password" name="confPass" id="confPass" placeholder="confirm your password" value="">
+            <button type="submit" name="signup">Signup</button>
+            <!-- <input type="submit" name="signup" value="signup"> -->
+        </div>
+    </form>
+</div>
 <p>Already have an account? <a href="/login">Log In</a></p>
 <%- include('../partials/footer');%>

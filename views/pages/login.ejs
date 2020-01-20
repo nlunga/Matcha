@@ -1,11 +1,17 @@
 <%- include('../partials/header');%>
 <h1><%= title %></h1>
+<div>
 <form action="/login" method="POST">
-    <label for="usename">Username: </label>
-    <input type="text" name="username" id="username" placeholder="username" value=""><br>
-    <label for="password">Password: </label>
-    <input type="password" name="password" id="password" placeholder="password" value=""><br>
-    <input type="submit" name="login" value="login">
+    <p id="errorMSG"> </p>
+    <div class="container">
+    <label for="username">Username</b></label>
+    <input type="text" name="username" id="username" placeholder="Enter your username" value="">
+    <label for="password">Password</b></label>
+    <input type="password" name="password" id="password" placeholder="Enter your password" value=""><br>
+    <button type="submit" name="login">Login</button>
+    <span class="psw"><a href="/tes">Forgot Password</a></span>
+    </div>
 </form>
+</div>
 <p>Don't have an account? <a href="/signup">Sign Up</a><p>
 <%- include('../partials/footer');%>
