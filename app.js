@@ -113,8 +113,8 @@ app.get('/profile', (req, res) => {
     res.render('pages/profile');
 });
 
-const postRoutes = require('./routes/posts');
-app.use('/signup', postRoutes);
+const registerRoutes = require('./routes/register');
+app.use('/signup', registerRoutes);
 
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute)
