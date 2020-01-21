@@ -5,7 +5,7 @@ const joi = require('joi');
 const session = require('express-session');
 // const mongo = require('mongodb');
 const app = express();
-const port = 3001;
+const port = 3000;
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
@@ -16,7 +16,7 @@ MongoClient.connect(url, (err, db) => {
     if (err) throw err;
     console.log("Database created!");
     db.close();
-}); 
+});
 
 ////////////////////////////////////////////////
 /// CREATING A COLLECTION
@@ -106,6 +106,13 @@ app.get('/login', (req, res) => {
         title:'login',
         headed: 'Login'
     });
+});
+
+app.get('/forgot_password', (req, res) => {
+    res.render('pages/forgot_password', {
+        title : 'Forgot Password',
+        headed: 'Forgot Password'
+    })
 });
 
 app.get('/profile', (req, res) => {
