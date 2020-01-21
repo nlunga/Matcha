@@ -5,7 +5,7 @@ const joi = require('joi');
 const session = require('express-session');
 // const mongo = require('mongodb');
 const app = express();
-const port = 3001;
+const port = 3000;
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
@@ -16,7 +16,7 @@ MongoClient.connect(url, (err, db) => {
     if (err) throw err;
     console.log("Database created!");
     db.close();
-}); 
+});
 
 ////////////////////////////////////////////////
 /// CREATING A COLLECTION
