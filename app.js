@@ -3,6 +3,7 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const joi = require('joi');
 const session = require('express-session');
+const passport = require('passport');
 // const mongo = require('mongodb');
 const app = express();
 const port = 3000;
@@ -38,14 +39,16 @@ app.set('views', path.join(__dirname, 'views'));
 ///////////////////////////////////////////////
 
 ///////////////////////////////////////////////
-//// SETTING UP A COOKIE
+//// SETTING UP A COOKIE AND PASSPORT MIDDLEWARE
 app.set('trust proxy', 1); // trust first proxy
 app.use(session({
-  secret: 'keyboard cat',
+  secret: 'haoPsURXAFxeB0ph',
   resave: false,
-  saveUninitialized: true,
-  cookie: { secure: true }
+  saveUninitialized: false,
+//   cookie: { secure: true }
 }));
+app.use(passport.initialize());
+app.use(passport.session());
 //////////////////////////////////////////////
 
 ///////////////////////////////////////////////
@@ -77,7 +80,8 @@ const getRoutes = require('./routes/api');
 app.use('/api', getRoutes);
 
 app.get('/', (req, res) => {
-    // console.log(req.body);
+    console.log(req.user);
+    console.log(req.isAuthenticated());
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home'
