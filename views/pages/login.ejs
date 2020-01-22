@@ -13,6 +13,10 @@
     </div>
 </form>
 <script type="text/javascript">
+    function checkPassword(str){
+        var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
+        return re.test(str);
+    }
     function validate(){
         var MSG;
         if(document.myForm.username.value == ""){
@@ -22,25 +26,25 @@
             document.getElementById("errorMSG").innerHTML = MSG;
             return false;
         }
+        if(myForm.password.value != "" ){
+            if(!checkPassword(myForm.password.value)){
+                // alert("Password must contain numbers, lowercase, uppercase letter and at least six characters");
+                MSG =("Password must contain numbers, lowercase, uppercase letter and at least six characters");
+                document.myForm.username.focus();
+                document.getElementById("errorMSG").innerHTML = MSG;
+                // myForm.password.focus();
+                return false
+            }
+        }else{
+            // alert("please provide your password!");
+            MSG = ("please provide your password!");
+            document.myForm.password.focus();
+            document.getElementById("errorMSG").innerHTML = MSG;
+            // myForm.password.focus();
+            return false;
+        }
+        return true;
     }
-    // function checkPassword(str){
-    //     var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
-    //     return re.test(str);
-    // }
-    // function checkForm(){
-    //     if(myForm.password.value != "" ){
-    //         if(!checkPassword(myForm.password.value)){
-    //             alert("error  test!");
-    //             myForm.password.focus();
-    //             return  false
-    //         }
-    //     }else{
-    //         alert("error test2");
-    //         myForm.password.focus();
-    //         return false;
-    //     }
-    //     return true;
-    // }
     </script>
 </div>
 <p>Don't have an account? <a href="/signup">Sign Up</a><p>
