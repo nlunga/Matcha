@@ -122,7 +122,9 @@ app.get('/profile', (req, res) => {
 
 app.get('/user-profile', (req, res) => {
     console.log(req.url);
-    res.render('pages/user-profile');
+    res.render('pages/user-profile', {
+        headed: "User Profile"
+    });
 });
 
 const registerRoutes = require('./routes/register');

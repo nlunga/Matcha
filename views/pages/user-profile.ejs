@@ -1,0 +1,25 @@
+<%- include('../partials/header');%>
+<h1>User profile</h1>
+<div> 
+    <form method="POST">
+        <div>
+            <img src="#" alt="profile photo"> 
+            <input type="file" onchange="readURL(this);"/>
+            <!-- gender -->
+            <p></p> <p>What is your gender?</p>
+            <input type="radio" name="gender" value="Male">male
+            <input type="radio" name="gender" value="Female">Female</br>
+            <p>Your sexual orientation</p>
+            <input type="radio" name="sexual" value="Guys">Guys
+            <input type="radio" name="sexual" value="Girls">Girls
+            <input type="radio" name="sexual" value="Both">Both</p>
+            <p>About you</p>
+            <textarea name="Bio" cols="50" rows="5">Write a bit about yourself...</textarea>
+            <p>Interests</p>
+            <input type="button" value="Add interests" onclick="window.location.href='/interests'">
+    
+        <p><input type="submit" value="Submit"></p>
+        </div>
+    </form>
+</div>
+<%- include('../partials/footer');%>
