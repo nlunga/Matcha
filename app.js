@@ -115,6 +115,12 @@ app.get('/forgot_password', (req, res) => {
     })
 });
 
+app.get('/reset-password', (req, res) => {
+    res.render('pages/reset-password', {
+        headed: 'Reset Password'
+    })
+});
+
 app.get('/profile', (req, res) => {
     console.log(req.url);
     res.render('pages/profile');
