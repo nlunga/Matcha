@@ -1,5 +1,6 @@
 const express = require('express');
 var bcrypt = require('bcrypt');
+const nodemailer = require('nodemailer');
 const router = express.Router();
 const joi = require('joi');
 const MongoClient = require('mongodb').MongoClient;
@@ -7,7 +8,7 @@ const url = "mongodb://localhost:27017/";
 const saltRounds = 10;
 
 router.post('/', (req, res) => {
-    // console.log(req.body);
+    // console.log(req.body); 
     const schema = joi.object().keys({
         firstName: joi.string().alphanum().min(3).max(30).required(),
         lastName : joi.string().alphanum().min(3).max(30).required(),
@@ -45,39 +46,41 @@ router.post('/', (req, res) => {
                             console.log('1 document inserted');
                             db.close();
                         });
+
+                        ///////////////////////////////////
+                        ///// Email sent to the user
+                        const transporter = nodemailer.createTransport({
+                            service: 'gmail',
+                            auth: {
+                                user: 'nlunga@student.wethinkcode.co.za',
+                                pass: '9876543210khulu'
+                            }
+                        });
+                            
+                        const mailOptions = {
+                            from: 'nlunga@student.wethinkcode.co.za',
+                            to: req.body.email,
+                            subject: 'Please Verify your email',
+                            text: `That was easy!`
+                        };
+                            
+                        transporter.sendMail(mailOptions, (error, info) => {
+                            if (error) {
+                                console.log(error);
+                            } else {
+                                console.log('Email sent: ' + info.response);
+                            }
+                        });
+                        ///////////////////////////////////
                         
                         res.render('pages/register-success', {
                             headed: "Registration",
                             data: req.body
                         });
                     });
-                    /*dbo.collection('users').findOne({ }, (err, result) => {
-                        console.log(result);
-                        // console.log('this is result ' + result[2].username);
-                        if (err) return console.log(err);
-                        if (result.username === req.body.username) {
-                            console.log('username already exists');
-                        }else if (result.email === req.body.email) {
-                            console.log('email already exists');
-                            
-                        }else{
-                            dbo.collection('users').insertOne(mydata, (err, res) => {
-                                if (err) return console.log(err);
-                                console.log('1 document inserted');
-                                db.close();
-                            });
-                            
-                            res.render('pages/register-success', {
-                                headed: "Registration",
-                                data: req.body
-                            });
-                        }
-                    });*/
-                    
                 });
 
             });
-            // console.log(data);
         }
     });
 });

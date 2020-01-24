@@ -3,17 +3,22 @@ const bodyParser = require('body-parser');
 const path = require('path');
 const joi = require('joi');
 const session = require('express-session');
+const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
 // const mongo = require('mongodb');
 const app = express();
 const port = 3000;
+const options = {
+    url: "mongodb://localhost:27017/Aphrodite",
+    ttl: 2 * 24 * 60 * 60
+};
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/Aphrodite";
 
-MongoClient.connect(url, (err, db) => {
+MongoClient.connect(url, {useUnifiedTopology: true} , (err, db) => {
     if (err) throw err;
     console.log("Database created!");
     db.close();
@@ -21,7 +26,7 @@ MongoClient.connect(url, (err, db) => {
 
 ////////////////////////////////////////////////
 /// CREATING A COLLECTION
-MongoClient.connect('mongodb://localhost:27017/', (err, db) => {
+MongoClient.connect('mongodb://localhost:27017/', {useUnifiedTopology: true}, (err, db) => {
     if (err) throw err;
     const dbo = db.db('Aphrodite');
     dbo.createCollection('users', (err, res) => {
@@ -39,12 +44,24 @@ app.set('views', path.join(__dirname, 'views'));
 ///////////////////////////////////////////////
 
 ///////////////////////////////////////////////
+// Session store on Mongodb
+// app.use(session({
+//     secret: 'JL8WMKwPJNHSQotp',
+//     store: new MongoStore(options),
+//     // proxy: true,
+//     resave: false,
+//     saveUninitialized: false
+// }));
+///////////////////////////////////////////////
+
+///////////////////////////////////////////////
 //// SETTING UP A COOKIE AND PASSPORT MIDDLEWARE
 app.set('trust proxy', 1); // trust first proxy
 app.use(session({
   secret: 'haoPsURXAFxeB0ph',
   resave: false,
   saveUninitialized: false,
+  store: new MongoStore(options)
 //   cookie: { secure: true }
 }));
 app.use(passport.initialize());
@@ -119,9 +136,11 @@ app.get('/forgot_password', (req, res) => {
     })
 });
 
-app.get('/profile', (req, res) => {
+app.get('/profile', authenticationMiddleware(), (req, res) => {
     console.log(req.url);
-    res.render('pages/profile');
+    res.render('pages/profile', {
+        headed: "profile"
+    });
 });
 
 const registerRoutes = require('./routes/register');
@@ -129,6 +148,37 @@ app.use('/signup', registerRoutes);
 
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute)
+
+// passport.use(new LocalStrategy(
+//     function(username, password, done) {
+//       User.findOne({ username: username }, function (err, user) {
+//         if (err) { return done(err); }
+//         if (!user) {
+//           return done(null, false, { message: 'Incorrect username.' });
+//         }
+//         if (!user.validPassword(password)) {
+//           return done(null, false, { message: 'Incorrect password.' });
+//         }
+//         console.log(username);
+//         console.log(password);
+//         return done(null, user);
+//       });
+//     }
+// ));
+
+/////////////////////////////////////////
+//// Authentification and page restriction middleware
+function authenticationMiddleware () {
+    return (req, res, next) => {
+        console.log(`
+            req.session.passport.user: ${JSON.stringify(req.session.passport)}
+        `);
+        if (req.isAuthenticated()) return next();
+
+        res.redirect('/login')
+    }
+}
+//////////////////////////////////////////
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
  
