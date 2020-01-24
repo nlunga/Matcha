@@ -2,8 +2,12 @@
 <h1>Welcome Home</h1>
 <center>
     <div class="container">
-        <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>
-        <a href="/signup"><button type="button" class="btn btn-outline-secondary">signup</button></a>
+        <% if (isAuthenticated) {%>
+            <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
+        <%}else {%>
+                <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>
+                <a href="/signup"><button type="button" class="btn btn-outline-secondary">signup</button></a>
+        <% } %>
     </div>
 </center>
 <%- include('../partials/footer');%>

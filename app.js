@@ -91,6 +91,11 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'public')));
 //////////////////////////////////////////////
 
+app.use((req, res, next) => {
+    res.locals.isAuthenticated = req.isAuthenticated();
+    next();
+});
+
 ///////////////////////////////////////////////////////
 ///// IMPORT ROUTES
 const getRoutes = require('./routes/api');
@@ -106,7 +111,6 @@ app.get('/', (req, res) => {
 });
 
 app.get('/index', (req, res) => {
-    // console.log(req.body);
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home'
@@ -114,7 +118,6 @@ app.get('/index', (req, res) => {
 });
 
 app.get('/signup', (req, res) => {
-    // console.log(req.body);
     res.render('pages/signup',{
         title:'Register an account',
         headed: 'Sign Up'
@@ -122,7 +125,6 @@ app.get('/signup', (req, res) => {
 });
 
 app.get('/login', (req, res) => {
-    // console.log(req.body);
     res.render('pages/login',{
         title:'login',
         headed: 'Login'
@@ -143,28 +145,20 @@ app.get('/profile', authenticationMiddleware(), (req, res) => {
     });
 });
 
+app.get('/logout', (req, res) => {
+    req.logout();
+    req.session.destroy();
+    res.render('pages/index',{
+        title:'Home',
+        headed: 'Home'
+    });
+});
+
 const registerRoutes = require('./routes/register');
 app.use('/signup', registerRoutes);
 
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute)
-
-// passport.use(new LocalStrategy(
-//     function(username, password, done) {
-//       User.findOne({ username: username }, function (err, user) {
-//         if (err) { return done(err); }
-//         if (!user) {
-//           return done(null, false, { message: 'Incorrect username.' });
-//         }
-//         if (!user.validPassword(password)) {
-//           return done(null, false, { message: 'Incorrect password.' });
-//         }
-//         console.log(username);
-//         console.log(password);
-//         return done(null, user);
-//       });
-//     }
-// ));
 
 /////////////////////////////////////////
 //// Authentification and page restriction middleware
@@ -181,4 +175,3 @@ function authenticationMiddleware () {
 //////////////////////////////////////////
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`));
- 
