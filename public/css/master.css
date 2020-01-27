@@ -1,0 +1,19 @@
+.card {
+  box-shadow: 5px 5px 15px skyblue;
+  transition: all 0.3 ease-in;
+  -webkit-transition: all 0.3s ease-in;
+  -moz-transition: all 0.3s ease-in;
+}
+
+.card:hover {
+  background: skyblue;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  box-shadow: 5px 5px 15px #9E9E9E;
+}
+
+.card:hover ul, .card:hover li{
+  color: white;
+  background: skyblue;
+}
