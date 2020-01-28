@@ -174,6 +174,32 @@ app.get('/confirmation/:id', (req, res) =>{
     });
 });
 
+app.get('/forgot/:id', (req, res) => {
+    const token = req.params.id;
+    const link ="mongodb://localhost:27017/";
+    MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+        if (err) throw err;
+        const dbo = db.db('Aphrodite');
+        dbo.collection('users').find({}).toArray(function(err, result) {
+            if (err) return console.log(err);
+            // result.forEach((item, index, array) => {
+            //     if (item.token === token) {
+            //         dbo.collection('users').updateOne(
+            //             { "confirmed" : item.confirmed, "token": token }, 
+            //             { $set: {"confirmed": "Yes", "token": ""} },
+            //             { upsert: true }
+            //         );
+            //         res.redirect('/login');
+            //     }
+            // });
+            if (req.url === `/reset-password/${token}`) {
+                
+            }
+            db.close();
+        });
+    });
+});
+
 app.get('/logout', (req, res) => {
     req.logout();
     req.session.destroy();
@@ -183,10 +209,10 @@ app.get('/logout', (req, res) => {
     });
 });
 
-<<<<<<< HEAD
 app.get('/see', (req, res) => {
     res.render('pages/suggestion');
-=======
+});
+
 app.get('/user-profile', (req, res) => {
     console.log(req.url);
     res.render('pages/user-profile', {
@@ -198,14 +224,16 @@ app.get('/reset-password', (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })
->>>>>>> mmovundl_branch
 });
 
 const registerRoutes = require('./routes/register');
 app.use('/signup', registerRoutes);
 
 const loginRoute = require('./routes/login');
-app.use('/login', loginRoute)
+app.use('/login', loginRoute);
+
+const forgotRoute = require('./routes/forgot_password');
+app.use('/forgot_password', forgotRoute);
 
 /////////////////////////////////////////
 //// Authentification and page restriction middleware
