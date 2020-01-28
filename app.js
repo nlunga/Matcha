@@ -151,6 +151,12 @@ app.get('/reset-password', (req, res) => {
     })
 });
 
+app.get('/reset-password/:id', (req, res) => {
+    res.render('pages/reset-password', {
+        headed: 'Reset Password'
+    })
+});
+
 app.get('/confirmation/:id', (req, res) =>{
     const token = req.params.id;
     const link ="mongodb://localhost:27017/";
@@ -182,19 +188,7 @@ app.get('/forgot/:id', (req, res) => {
         const dbo = db.db('Aphrodite');
         dbo.collection('users').find({}).toArray(function(err, result) {
             if (err) return console.log(err);
-            // result.forEach((item, index, array) => {
-            //     if (item.token === token) {
-            //         dbo.collection('users').updateOne(
-            //             { "confirmed" : item.confirmed, "token": token }, 
-            //             { $set: {"confirmed": "Yes", "token": ""} },
-            //             { upsert: true }
-            //         );
-            //         res.redirect('/login');
-            //     }
-            // });
-            if (req.url === `/reset-password/${token}`) {
-                
-            }
+            res.redirect(`/reset-password/${token}`)
             db.close();
         });
     });
