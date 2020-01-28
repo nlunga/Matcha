@@ -145,6 +145,12 @@ app.get('/profile', authenticationMiddleware(), (req, res) => {
     });
 });
 
+app.get('/reset-password', (req, res) => {
+    res.render('pages/reset-password', {
+        headed: 'Reset Password'
+    })
+});
+
 app.get('/confirmation/:id', (req, res) =>{
     const token = req.params.id;
     const link ="mongodb://localhost:27017/";
@@ -175,6 +181,19 @@ app.get('/logout', (req, res) => {
         title:'Home',
         headed: 'Home'
     });
+});
+
+app.get('/user-profile', (req, res) => {
+    console.log(req.url);
+    res.render('pages/user-profile', {
+        headed: "User Profile"
+    });
+});
+
+app.get('/reset-password', (req, res) => {
+    res.render('pages/reset-password', {
+        headed: 'Reset Password'
+    })
 });
 
 const registerRoutes = require('./routes/register');
