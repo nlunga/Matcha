@@ -6,6 +6,7 @@ const joi = require('joi');
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/";
 const saltRounds = 10;
+const emailToken = Math.ceil(Math.random() * 2147483647);
 
 router.post('/', (req, res) => {
     // console.log(req.body); 
@@ -25,11 +26,11 @@ router.post('/', (req, res) => {
             res.send("An error has occured. " + err);
             console.log(err);
         }else {
-            MongoClient.connect(url, (err, db) => {
+            MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
                 if (err) return console.log(err);
                 bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
                     const dbo = db.db('Aphrodite');
-                    const mydata = {firstName: req.body.firstName, lastName: req.body.lastName, username: req.body.username, email: req.body.email, password: hash};
+                    const mydata = {firstName: req.body.firstName, lastName: req.body.lastName, username: req.body.username, email: req.body.email, password: hash, confirmed: "No", token: emailToken};
                     dbo.collection('users').find({}, { projection: { _id: 0, username: 1, email: 1 } }).toArray(function(err, result) {
                         // const dataLenght = result.length;
                         if (err) return console.log(err);
@@ -56,12 +57,17 @@ router.post('/', (req, res) => {
                                 pass: '9876543210khulu'
                             }
                         });
-                            
+                        // var emailToken = "jhdashghohwg2gwg";
+                        const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
                         const mailOptions = {
                             from: 'nlunga@student.wethinkcode.co.za',
                             to: req.body.email,
                             subject: 'Please Verify your email',
-                            text: `That was easy!`
+                            text: `That was easy!`,
+                            html: `Please click on the link bellow to confirm your email:<br>
+                                   
+                            <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
+                            `
                         };
                             
                         transporter.sendMail(mailOptions, (error, info) => {
