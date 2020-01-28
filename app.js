@@ -177,6 +177,10 @@ app.get('/logout', (req, res) => {
     });
 });
 
+app.get('/see', (req, res) => {
+    res.render('pages/suggestion');
+});
+
 const registerRoutes = require('./routes/register');
 app.use('/signup', registerRoutes);
 
