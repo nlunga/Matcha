@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
     MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
         if (err) throw err;
         const dbo = db.db('Aphrodite');
-    dbo.collection('users').find({}).toArray(function(err, result) {
+        dbo.collection('users').find({}).toArray(function(err, result) {
             // console.log(result);
             if (err) return console.log(err);
             result.forEach((item, index, array) => {

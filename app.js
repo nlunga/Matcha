@@ -145,6 +145,28 @@ app.get('/profile', authenticationMiddleware(), (req, res) => {
     });
 });
 
+app.get('/confirmation/:id', (req, res) =>{
+    const token = req.params.id;
+    const link ="mongodb://localhost:27017/";
+    MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+        if (err) throw err;
+        const dbo = db.db('Aphrodite');
+        dbo.collection('users').find({}).toArray(function(err, result) {
+            if (err) return console.log(err);
+            result.forEach((item, index, array) => {
+                if (item.token === token) {
+                    dbo.collection('users').updateOne(item.confirmed, "Yes", (err, res) => {
+                        if (err) throw err;
+                        console.log("1 document updated");
+                        db.close();
+                    });
+                }
+            });
+            db.close();
+        });
+    });
+});
+
 app.get('/logout', (req, res) => {
     req.logout();
     req.session.destroy();

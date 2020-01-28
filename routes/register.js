@@ -1,12 +1,13 @@
 const express = require('express');
 var bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
+const uuidv1 = require('uuid/v1');
 const router = express.Router();
 const joi = require('joi');
 const MongoClient = require('mongodb').MongoClient;
 const url = "mongodb://localhost:27017/";
 const saltRounds = 10;
-const emailToken = Math.ceil(Math.random() * 2147483647);
+const emailToken = uuidv1();
 
 router.post('/', (req, res) => {
     // console.log(req.body); 
@@ -43,7 +44,6 @@ router.post('/', (req, res) => {
                             }
                         }
                         dbo.collection('users').insertOne(mydata, (err, res) => {
-                            const test = mydata._id;
                             if (err) return console.log(err);
                             console.log('1 document inserted');
                             db.close();
@@ -59,7 +59,7 @@ router.post('/', (req, res) => {
                             }
                         });
                         // var emailToken = "jhdashghohwg2gwg";
-                        const conUrl = `http://localhost:3000/confirmation/${test}`;
+                        const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
                         const mailOptions = {
                             from: 'nlunga@student.wethinkcode.co.za',
                             to: req.body.email,
