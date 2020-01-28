@@ -43,6 +43,7 @@ router.post('/', (req, res) => {
                             }
                         }
                         dbo.collection('users').insertOne(mydata, (err, res) => {
+                            const test = mydata._id;
                             if (err) return console.log(err);
                             console.log('1 document inserted');
                             db.close();
@@ -58,7 +59,7 @@ router.post('/', (req, res) => {
                             }
                         });
                         // var emailToken = "jhdashghohwg2gwg";
-                        const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
+                        const conUrl = `http://localhost:3000/confirmation/${test}`;
                         const mailOptions = {
                             from: 'nlunga@student.wethinkcode.co.za',
                             to: req.body.email,
