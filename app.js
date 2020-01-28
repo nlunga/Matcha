@@ -133,6 +133,12 @@ app.get('/user-profile', (req, res) => {
     });
 });
 
+app.get('/reset-password', (req, res) => {
+    res.render('pages/reset-password', {
+        headed: 'Reset Password'
+    })
+});
+
 const registerRoutes = require('./routes/register');
 app.use('/signup', registerRoutes);
 
