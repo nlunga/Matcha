@@ -145,6 +145,29 @@ app.get('/profile', authenticationMiddleware(), (req, res) => {
     });
 });
 
+app.get('/confirmation/:id', (req, res) =>{
+    const token = req.params.id;
+    const link ="mongodb://localhost:27017/";
+    MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+        if (err) throw err;
+        const dbo = db.db('Aphrodite');
+        dbo.collection('users').find({}).toArray(function(err, result) {
+            if (err) return console.log(err);
+            result.forEach((item, index, array) => {
+                if (item.token === token) {
+                    dbo.collection('users').updateOne(
+                        { "confirmed" : item.confirmed, "token": token }, 
+                        { $set: {"confirmed": "Yes", "token": ""} },
+                        { upsert: true }
+                    );
+                    res.redirect('/login');
+                }
+            });
+            db.close();
+        });
+    });
+});
+
 app.get('/logout', (req, res) => {
     req.logout();
     req.session.destroy();
@@ -152,10 +175,6 @@ app.get('/logout', (req, res) => {
         title:'Home',
         headed: 'Home'
     });
-});
-
-app.get('/see', (req, res)=> {
-    res.render('pages/suggestion');
 });
 
 const registerRoutes = require('./routes/register');

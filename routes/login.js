@@ -10,7 +10,7 @@ router.post('/', (req, res) => {
     MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
         if (err) throw err;
         const dbo = db.db('Aphrodite');
-    dbo.collection('users').find({}).toArray(function(err, result) {
+        dbo.collection('users').find({}).toArray(function(err, result) {
             // console.log(result);
             if (err) return console.log(err);
             result.forEach((item, index, array) => {
@@ -23,14 +23,19 @@ router.post('/', (req, res) => {
                         // });
                         const hash = item.password;
                         
-                        bcrypt.compare(req.body.password, hash, (err, response) => {
-                        if (response === true) {
-                            req.login(user_id, (err) => {
-                                res.redirect('/');
-                            });
-                            console.log('loggen in');
-                        }else {
-                            return console.log('password does not match');
+                    bcrypt.compare(req.body.password, hash, (err, response) => {
+                        if (item.confirmed === "No") {
+                            console.log("Please confirm your email");
+                            res.redirect("/login");
+                        }else if (item.confirmed === "Yes") {
+                            if (response === true) {
+                                req.login(user_id, (err) => {
+                                    res.redirect('/');
+                                });
+                                console.log('loggen in');
+                            }else {
+                                return console.log('password does not match');
+                            }
                         }
                     });
                 }else if (item.username !== req.body.username && req.body.password) {
