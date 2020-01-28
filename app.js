@@ -155,11 +155,16 @@ app.get('/confirmation/:id', (req, res) =>{
             if (err) return console.log(err);
             result.forEach((item, index, array) => {
                 if (item.token === token) {
-                    dbo.collection('users').updateOne(item.confirmed, "Yes", (err, res) => {
-                        if (err) throw err;
-                        console.log("1 document updated");
-                        db.close();
-                    });
+                    // dbo.collection('users').updateOne(item.confirmed, "Yes", (err, res) => {
+                    //     if (err) throw err;
+                    //     console.log("1 document updated");
+                    //     db.close();
+                    // });
+                    dbo.collection('users').updateOne(
+                        { "confirmed" : item.confirmed, "token": token }, 
+                        { $set: {"confirmed": "Yes", "token": ""} },
+                        { upsert: true }
+                    );
                 }
             });
             db.close();
