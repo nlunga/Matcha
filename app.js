@@ -229,6 +229,9 @@ app.use('/login', loginRoute);
 const forgotRoute = require('./routes/forgot_password');
 app.use('/forgot_password', forgotRoute);
 
+const resetPassRouter = require('./routes/reset');
+app.use('/reset-password/:id', resetPassRouter);
+
 /////////////////////////////////////////
 //// Authentification and page restriction middleware
 function authenticationMiddleware () {

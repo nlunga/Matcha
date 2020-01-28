@@ -5,7 +5,7 @@ const MongoClient = require('mongodb').MongoClient;
 const bcrypt = require('bcrypt');
 const url = "mongodb://localhost:27017/";
 
-router.post('/:id', (req, res) => {
+router.post('/', (req, res) => {
     console.log(req.url + " " + req.param.id);
 });
 
