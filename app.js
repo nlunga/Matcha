@@ -204,7 +204,9 @@ app.get('/logout', (req, res) => {
 });
 
 app.get('/see', (req, res) => {
-    res.render('pages/suggestion');
+    res.render('pages/suggestion', {
+        headed: "MATCHA - [suggestion.html]"
+    });
 });
 
 app.get('/user-profile', (req, res) => {
