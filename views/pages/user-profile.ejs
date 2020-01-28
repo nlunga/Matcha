@@ -1,0 +1,71 @@
+<%- include('../partials/header');%>
+    <h1>User profile</h1>
+    <div>
+        <form method="POST">
+            <div>
+                <img id=imgprod1 src="someimage.gif" onerror="this.onerror=null; this.src= 'Image!10AngImageHere.jpg';">
+                <!-- <img src="../image.png" alt=" Add profile photo"> -->
+                <P> Name <input class="profileName" type="text" name="profileName" id="profileName" placeholder="Enter your Name" value=""></p>
+
+                <p> Age (between 18 and 50): <input type="number" name="quantity" min="18" max="50">
+
+                <p>What is your gender?</p>
+                <input type="radio" name="gender" value="Male"> male
+                <input type="radio" name="gender" value="Female"> Female</br>
+
+                <p>Your sexual orientation</p>
+                <input type="radio" name="sexual" value="Guys"> Guys
+                <input type="radio" name="sexual" value="Girls"> Girls
+                <input type="radio" name="sexual" value="Both"> Both</p>
+
+                <p>About you</p>
+                <textarea name="Bio" cols="50" rows="5">Write a bit about yourself...</textarea>
+
+                <p>Interests</p>
+                <input type="button" value="Add interests" onclick="window.location.href='/interests'">
+
+                <p>Profile gallery</p>
+                <div class="row">
+                    <div class="column">
+                        <img src="#" alt="image1" >
+                    </div>
+                    <div class="column">
+                        <img src="#" alt="image2">
+                    </div>
+                    <div class="column">
+                        <img src="#" alt="image3">
+                    </div>
+                    <div class="column">
+                        <img src="#" alt="image4">
+                    </div>
+                    <div class="column">
+                        <img src="#" alt="image5">
+                    </div>
+                </div>
+
+                <!-- <div id= "navigation">
+                    <a href="javascript: onClick=showPage('1')">page 1</a>
+                    <a href="javascript: onClick=showPage('2')">page 2</a>
+                </div>
+                <div id= "page1" style="display: none" >
+                </div>
+                <div id= "page2" style="display: none">
+                </div> -->
+                <p><input type="submit" value="Submit"></p>
+            </div>
+        </form>
+        <!-- <script type="text/javascript">
+        function showPage(id)
+        {
+            var totalNumberOfPages = 2;
+            for (i = 1; i <= totalNumberOfPages; i++)
+            {
+                if(document.getElementById('page'+i))
+                document.getElementById('page'+i).style.display='none';
+            }
+            if(document.getElementById('page'+id))
+            document.getElementById('page'+id).style.display='block';
+        }
+        </script> -->
+    </div>
+    <%- include('../partials/footer');%>
