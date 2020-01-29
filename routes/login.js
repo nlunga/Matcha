@@ -28,6 +28,17 @@ router.post('/', (req, res) => {
                             console.log("Please confirm your email");
                             res.redirect("/login");
                         }else if (item.confirmed === "Yes") {
+                            /////////////////////////////////////////////
+                            /// TEST RUN IF IT FAILS DELETE SCRIPT
+                            MongoClient.connect(url, { useUnifiedTopology: true },(err, db) => {
+                                const dbo = db.db('Aphrodite');
+                                dbo.createCollection('userInfo', (err, db) => {
+                                    if (err) throw err;
+                                    console.log('userInfo Collection created');
+                                });
+                                db.close();
+                            });
+                            /////////////////////////////////////////////
                             if (response === true) {
                                 req.login(user_id, (err) => {
                                     res.redirect('/');
