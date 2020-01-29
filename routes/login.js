@@ -36,7 +36,6 @@ router.post('/', (req, res) => {
                                     if (err) throw err;
                                     console.log('userInfo Collection created');
                                 });
-                                db.close();
                             });
                             /////////////////////////////////////////////
                             if (response === true) {

@@ -153,7 +153,8 @@ app.get('/reset-password', (req, res) => {
 
 app.get('/reset-password/:id', (req, res) => {
     res.render('pages/reset-password', {
-        headed: 'Reset Password'
+        headed: 'Reset Password',
+        id: req.params.id
     })
 });
 
@@ -216,12 +217,6 @@ app.get('/user-profile', (req, res) => {
     });
 });
 
-app.get('/reset-password', (req, res) => {
-    res.render('pages/reset-password', {
-        headed: 'Reset Password'
-    })
-});
-
 const registerRoutes = require('./routes/register');
 app.use('/signup', registerRoutes);
 
@@ -232,7 +227,7 @@ const forgotRoute = require('./routes/forgot_password');
 app.use('/forgot_password', forgotRoute);
 
 const resetPassRouter = require('./routes/reset');
-app.use('/reset-password/:id', resetPassRouter);
+app.use('/reset-password', resetPassRouter);
 
 /////////////////////////////////////////
 //// Authentification and page restriction middleware
