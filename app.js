@@ -183,10 +183,10 @@ app.get('/logout', (req, res) => {
     });
 });
 
-<<<<<<< HEAD
 app.get('/see', (req, res) => {
     res.render('pages/suggestion');
-=======
+});
+
 app.get('/user-profile', (req, res) => {
     console.log(req.url);
     res.render('pages/user-profile', {
@@ -198,7 +198,6 @@ app.get('/reset-password', (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })
->>>>>>> mmovundl_branch
 });
 
 const registerRoutes = require('./routes/register');
