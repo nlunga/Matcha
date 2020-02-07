@@ -2,70 +2,54 @@
     <h1>User profile</h1>
     <div>
         <form method="POST">
-            <div>
-                <img id=imgprod1 src="someimage.gif" onerror="this.onerror=null; this.src= 'Image!10AngImageHere.jpg';">
-                <!-- <img src="../image.png" alt=" Add profile photo"> -->
-                <P> Name <input class="profileName" type="text" name="profileName" id="profileName" placeholder="Enter your Name" value=""></p>
-
-                <p> Age (between 18 and 50): <input type="number" name="quantity" min="18" max="50">
-
-                <p>What is your gender?</p>
-                <input type="radio" name="gender" value="Male"> male
-                <input type="radio" name="gender" value="Female"> Female</br>
-
-                <p>Your sexual orientation</p>
-                <input type="radio" name="sexual" value="Guys"> Guys
-                <input type="radio" name="sexual" value="Girls"> Girls
-                <input type="radio" name="sexual" value="Both"> Both</p>
-
-                <p>About you</p>
-                <textarea name="Bio" cols="50" rows="5">Write a bit about yourself...</textarea>
-
-                <p>Interests</p>
-                <input type="button" value="Add interests" onclick="window.location.href='/interests'">
-
-                <p>Profile gallery</p>
-                <div class="row">
-                    <div class="column">
-                        <img src="#" alt="image1" >
+            <div class="wrapper">
+                <div class="left">
+                    <div class="image-preview" id="image-preview">
                     </div>
-                    <div class="column">
-                        <img src="#" alt="image2">
-                    </div>
-                    <div class="column">
-                        <img src="#" alt="image3">
-                    </div>
-                    <div class="column">
-                        <img src="#" alt="image4">
-                    </div>
-                    <div class="column">
-                        <img src="#" alt="image5">
-                    </div>
+                    <img src="image2.jpeg" alt="user" width="100">
                 </div>
+                <div class="right">
+                    <div class="info">
+                        <h3>Your Profile</h3>
+                        <div class="info_data"></div>
+                        <div class="data">
+                            <h5>Name <input class="profileName" type="text" name="profileName" 
+                                id="profileName" placeholder="Enter your Name" value=""></h5>
+                            <p><h5> Your age <input type="number" name="quantity" min="18" max="50"></h5></p>
 
-                <!-- <div id= "navigation">
-                    <a href="javascript: onClick=showPage('1')">page 1</a>
-                    <a href="javascript: onClick=showPage('2')">page 2</a>
+                            <h5>What is your gender?</h5>
+                            <input type="radio" name="gender" value="Male"> Male
+                            <input type="radio" name="gender" value="Female"> Female
+                        </br>
+                        <h5>Your sexual orientation</h5>
+                        <input type="radio" name="sexual" value="Guys"> Guys
+                        <input type="radio" name="sexual" value="Girls"> Girls
+                        <input type="radio" name="sexual" value="Both"> Both</p>
                 </div>
-                <div id= "page1" style="display: none" >
-                </div>
-                <div id= "page2" style="display: none">
-                </div> -->
-                <p><input type="submit" value="Submit"></p>
+                <div class="data">
+                    <h5>About you</h5>
+                    <textarea name="Bio" cols="35" rows="5">Write a bit about yourself...</textarea>
+                </br>
+                <div class="data">
+                    <h5>My Location</h5>
+                </div>  
             </div>
-        </form>
-        <!-- <script type="text/javascript">
-        function showPage(id)
-        {
-            var totalNumberOfPages = 2;
-            for (i = 1; i <= totalNumberOfPages; i++)
-            {
-                if(document.getElementById('page'+i))
-                document.getElementById('page'+i).style.display='none';
-            }
-            if(document.getElementById('page'+id))
-            document.getElementById('page'+id).style.display='block';
-        }
-        </script> -->
+            <div class="projects">
+                <!-- <h3>projects</h3> -->
+                <h3>Interests</h3>
+                <input type="button" value="Add interests" onclick="window.location.href='/interests'">
+            </br>
+                <div class="projects_data"></div>
+                <div class="data">
+                    <h3>Profile gallery</h3>
+                </br>
+                    <p><input type="submit" value="Submit"></p>
+                </div>
+               
+            </div>
+        </div>
+            </div>
+            
+        </form> 
     </div>
     <%- include('../partials/footer');%>
