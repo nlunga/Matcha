@@ -30,7 +30,7 @@ router.post('/', (req, res) => {
                         }else if (item.confirmed === "Yes") {
                             if (response === true) {
                                 req.login(user_id, (err) => {
-                                    res.redirect('/');
+                                    res.redirect('/see');
                                 });
                                 console.log('loggen in');
                             }else {
