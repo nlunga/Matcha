@@ -1,55 +1,86 @@
 <%- include('../partials/header');%>
-    <h1>User profile</h1>
-    <div>
-        <form method="POST">
-            <div class="wrapper">
-                <div class="left">
-                    <div class="image-preview" id="image-preview">
-                    </div>
-                    <img src="image2.jpeg" alt="user" width="100">
-                </div>
-                <div class="right">
-                    <div class="info">
-                        <h3>Your Profile</h3>
-                        <div class="info_data"></div>
-                        <div class="data">
-                            <h5>Name <input class="profileName" type="text" name="profileName" 
-                                id="profileName" placeholder="Enter your Name" value=""></h5>
-                            <p><h5> Your age <input type="number" name="quantity" min="18" max="50"></h5></p>
+<div class="container-fluid bg">
+    <div class="row">
 
-                            <h5>What is your gender?</h5>
-                            <input type="radio" name="gender" value="Male"> Male
-                            <input type="radio" name="gender" value="Female"> Female
-                        </br>
-                        <h5>Your sexual orientation</h5>
-                        <input type="radio" name="sexual" value="Guys"> Guys
-                        <input type="radio" name="sexual" value="Girls"> Girls
-                        <input type="radio" name="sexual" value="Both"> Both</p>
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+        <!-- <div class="col-md-4 col-sm-4 col-xs-12"> -->
+
+            <form method="POST" action="/see#" class="form-container">
+                <h1>Your Profile</h1>
+                <!-- profile image -->
+                <div class="form-group">
+                   <img src="/img/image2.png" alt="..." class="img-thumbnail">
                 </div>
-                <div class="data">
-                    <h5>About you</h5>
-                    <textarea name="Bio" cols="35" rows="5">Write a bit about yourself...</textarea>
-                </br>
-                <div class="data">
-                    <h5>My Location</h5>
-                </div>  
-            </div>
-            <div class="projects">
-                <!-- <h3>projects</h3> -->
-                <h3>Interests</h3>
-                <input type="button" value="Add interests" onclick="window.location.href='/interests'">
-            </br>
-                <div class="projects_data"></div>
-                <div class="data">
-                    <h3>Profile gallery</h3>
-                </br>
-                    <p><input type="submit" value="Submit"></p>
+                
+                <!-- user name -->
+                <div class="form-group">
+                    <label>Name</label>
+                    <input type="text" class="form-control" placeholder="Enter name">
                 </div>
-               
+                
+                <!-- select your age -->
+                <div class="form-group">
+                    <label for="selectYourAge">Your age</label>
+                    <input class="form-control" id="selectYourAge" type="number" name="quantity" min="18" max="50">
+                </div>
+                                  
+                <!-- Select your gender -->
+                <label>What is your gender?</label>
+                <div class="custom-control custom-radio">
+                    <input type="radio" id="customRadio1" name="customRadio" class="custom-control-input"> 
+                    <label class="custom-control-label" for= "customRadio1">Male</label>
+                </div>
+                <div class="custom-control custom-radio">
+                    <input type="radio" id="customRadio2" name="customRadio" class="custom-control-input"> 
+                    <label class="custom-control-label" for="customRadio2">Female</label>
+                </div>
+                
+                <!-- sexual orientation -->
+                <div>
+                    <label for="NameOfUser">Your sexual orientation</label>
+                    <div class="btn-group" role="group">
+                        <button type="button" class="btn btn-info">Guys</button>
+                        <button type="button" class="btn btn-info">Girls</button>
+                        <button type="button" class="btn btn-info">Both</button>
+                    </div>
+                </div>
+                
+                <!-- Profile location -->
+                <div>
+                    <label for="NameOfUser">My Location</label>
+                    <select class="custom-select" size="3">
+                        <option value="1">Cape Town</option>
+                        <option value="2">Johannesburg</option>
+                        <option value="3">Durban</option>
+                        <option value="4">Pretoria</option>
+                        <option value="5">Port Elizabeth</option>
+                        <option value="6">Bloemfontein</option>
+                        <option value="7">East London</option>
+                        <option value="8">Soweto</option>
+                        <option value="9">Polokwane</option>
+                        <option value="10">Nelspruit</option>
+
+                    </select>
+                </div>
+                
+                <!-- interests tags -->
+                <div class="form-group">
+                    <label>Add interests to your profile</label>
+                    <button type="button" class="btn btn-info">Add interests</button>
+                </div>
+                
+                <!-- Textarea  -->
+                <div class="form-group">
+                    <label for="Textarea">About you</label>
+                    <textarea class="form-control" id="Textarea" row="3"></textarea>
+                </div> 
+                
+                <!-- submit button -->
+                <div class="form-group">
+                    <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+                </div>
             </div>
-        </div>
-            </div>
-            
-        </form> 
+        </form>
     </div>
-    <%- include('../partials/footer');%>
+</div>
+<%- include('../partials/footer');%>
