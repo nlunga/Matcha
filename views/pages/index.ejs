@@ -1,13 +1,30 @@
 <%- include('../partials/header');%>
-<h1>Welcome Home</h1>
 <center>
-    <div class="container">
-        <% if (isAuthenticated) {%>
-            <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
-        <% }else { %>
-            <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>
-            <a href="/signup"><button type="button" class="btn btn-outline-secondary">signup</button></a>
-        <% } %>
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a href="/" class="navbar-brand">Matcha</a>
+        <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+    
+      <div class="collapse navbar-collapse" id="navbarMenu">
+        <ul class="navbar-nav mx-auto">
+            <% if (isAuthenticated) {%>
+                <li class="nav-item"><a href="/see" class="nav-link active">Suggestions</a></li>
+                <li class="nav-item"><a href="/profile" class="nav-link">Profile</a></li>
+                <li class="nav-item"><a href="/logout" class="nav-link">logout</a></li>
+            <% }else { %>
+                <li class="nav-item"><a href="/login" class="nav-link">login</a></li>
+                <li class="nav-item"><a href="/signup" class="nav-link">signup</a></li>
+            <% } %>
+        </ul>
     </div>
+    </nav>
+    <% if (isAuthenticated) {%>
+        <h1>Welcome <%=(typeof user != "undefined" ? user : "")%></h1>
+        <!-- <h1>Welcome <%//if (user === null) {%>
+                <%//user = "no"%>
+            <%//}%>
+        </h1> -->
+    <% } %>
 </center>
 <%- include('../partials/footer');%>

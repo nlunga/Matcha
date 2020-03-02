@@ -40,7 +40,12 @@ router.post('/', (req, res) => {
                             /////////////////////////////////////////////
                             if (response === true) {
                                 req.login(user_id, (err) => {
-                                    res.redirect('/');
+                                    // res.redirect('/');
+                                    res.render('pages/index', {
+                                        user: req.body.username,
+                                        headed : "Home"
+                                    });
+                                    console.log(req.body.username);
                                 });
                                 console.log('loggen in');
                             }else {
