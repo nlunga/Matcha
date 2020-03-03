@@ -20,11 +20,7 @@
     </div>
     </nav>
     <% if (isAuthenticated) {%>
-        <h1>Welcome <%=(typeof user != "undefined" ? user : "")%></h1>
-        <!-- <h1>Welcome <%//if (user === null) {%>
-                <%//user = "no"%>
-            <%//}%>
-        </h1> -->
+        <h1>Welcome <%=(typeof user != "undefined" ? user : "dont fail me!")%></h1>
     <% } %>
 </center>
 <%- include('../partials/footer');%>

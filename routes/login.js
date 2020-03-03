@@ -2,66 +2,36 @@ const express = require('express');
 const router = express.Router();
 const passport = require('passport');
 const MongoClient = require('mongodb').MongoClient;
+// const session = require('express-session');
 const bcrypt = require('bcrypt');
 const url = "mongodb://localhost:27017/";
 
+router.post('/', (req, res)=>{
+    const user = req.body.username;
+    const pass = req.body.password;
+    const session = req.session;
 
-router.post('/', (req, res) => {
-    MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+    MongoClient.connect(url, {useUnifiedTopology: true}, (err, db) => {
         if (err) throw err;
         const dbo = db.db('Aphrodite');
-        dbo.collection('users').find({}).toArray(function(err, result) {
-            // console.log(result);
-            if (err) return console.log(err);
-            result.forEach((item, index, array) => {
-                if (item.username === req.body.username && req.body.password) {
-                    const user_id = item._id;
-                    // res.render(`pages/profile`, {
-                        //     headed: req.body.username,
-                        //     username: req.body.username,
-                        //     data: req.body
-                        // });
-                        const hash = item.password;
-                        
-                    bcrypt.compare(req.body.password, hash, (err, response) => {
-                        if (item.confirmed === "No") {
-                            console.log("Please confirm your email");
-                            res.redirect("/login");
-                        }else if (item.confirmed === "Yes") {
-                            /////////////////////////////////////////////
-                            /// TEST RUN IF IT FAILS DELETE SCRIPT
-                            MongoClient.connect(url, { useUnifiedTopology: true },(err, db) => {
-                                const dbo = db.db('Aphrodite');
-                                dbo.createCollection('userInfo', (err, db) => {
-                                    if (err) throw err;
-                                    console.log('userInfo Collection created');
-                                });
+        dbo.collection('users').find({}).toArray((err, result) => {
+            if (err) throw err;
+            result.forEach((item, index) => {
+                if (item.username === user && pass) {
+                    const hash = item.password;
+                    bcrypt.compare(pass, hash, (err, response) => {
+                        if (response === true) {
+                            res.render('pages/index', {
+                                headed: "Home",
+                                user: user
                             });
-                            /////////////////////////////////////////////
-                            if (response === true) {
-                                req.login(user_id, (err) => {
-                                    // res.redirect('/');
-                                    res.render('pages/index', {
-                                        user: req.body.username,
-                                        headed : "Home"
-                                    });
-                                    console.log(req.body.username);
-                                });
-                                console.log('loggen in');
-                            }else {
-                                return console.log('password does not match');
-                            }
                         }
                     });
-                }else if (item.username !== req.body.username && req.body.password) {
-                    return console.log("username does not exist");
                 }
-            }); 
+            });
         });
     });
 });
-
-
 
 passport.serializeUser((user_id, done) => {
     done(null, user_id);
