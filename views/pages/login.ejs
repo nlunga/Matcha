@@ -1,17 +1,29 @@
 <%- include('../partials/header');%>
 <h1><%= title %></h1>
-<div>
-<form action="/login" method="POST" name = "myForm" onsubmit = "return(validate());">
-    <p id="errorMSG"> </p>
-    <div class="container">
-    <label for="username">Username</b></label>
-    <input type="text" name="username" id="username" placeholder="Enter your username" value="">
-    <label for="password">Password</b></label>
-    <input type="password" name="password" id="password" placeholder="Enter your password" value=""><br>
-    <button type="submit" name="login">Login</button>
-    <span class="psw"><a href="/forgot_password">Forgot Password</a></span>
+<div class="container-fluid bg">
+    <div class="row">
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+
+        <form action="/login" method="POST" name = "myForm" onsubmit="return(validate());" class="form-container" id="Login">
+            <h1>Login</h1>
+            <p id="errorMSG"></p>
+            <div class="form-group">
+                <label for="username">Username</label>
+                <input type="text" name="username" class="form-control"id="username" placeholder="Enter your username" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" class="form-control" id="password" placeholder="Enter your password" value="">
+            </div>
+
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg btn-block" name="login">Login</button>
+            </div>
+                <span class="psw"><a href="/forgot_password">Forgot Password</a></span>
+        </form>
     </div>
-</form>
+</div>
 <script type="text/javascript">
     function checkPassword(str){
         var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
@@ -46,6 +58,5 @@
         return true;
     }
     </script>
-</div>
 <p>Don't have an account? <a href="/signup">Sign Up</a><p>
-<%- include('../partials/footer');%>
+    <%- include('../partials/footer');%>

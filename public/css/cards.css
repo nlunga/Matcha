@@ -1,7 +1,9 @@
 body{
     margin: 0;
     padding: 0;
-    background: tomato;
+    /* background: tomato; */
+    background: url('/img/laura-vinck-Hyu76loQLdk-unsplash.jpg')no-repeat center center fixed;
+    background-size: cover;
 }
 
 .card_h2, .card_h4{

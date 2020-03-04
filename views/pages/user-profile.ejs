@@ -1,29 +1,29 @@
 <%- include('../partials/header');%>
 <div class="container-fluid bg">
+    <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+        <a href="#" class="navbar-brand">Matcha</a>
+        <a href="#" class="nav-link active">Home page</a>
+    </nav>
     <div class="row">
-
+        
         <div class="col-md-4 col-sm-4 col-xs-12"></div>
         <!-- <div class="col-md-4 col-sm-4 col-xs-12"> -->
-
-            <form method="POST" action="/see#" class="form-container">
+            
+            <form id='user-profile' method="POST" action="/see#" class="form-container">
                 <h1>Your Profile</h1>
-                <!-- profile image -->
-                <div class="form-group">
-                   <img src="/img/image2.png" alt="..." class="img-thumbnail">
-                </div>
                 
                 <!-- user name -->
                 <div class="form-group">
-                    <label>Name</label>
-                    <input type="text" class="form-control" placeholder="Enter name">
+                    <!-- <label>Name</label> -->
+                    <input type="text" class="form-control" placeholder="Enter your name">
                 </div>
                 
                 <!-- select your age -->
                 <div class="form-group">
-                    <label for="selectYourAge">Your age</label>
-                    <input class="form-control" id="selectYourAge" type="number" name="quantity" min="18" max="50">
+                    <label for="selectYourAge">Your age (between 18 and 50):</label>
+                    <input type="number" name="quantity" min="18" max="50" placeholder="18">
                 </div>
-                                  
+                
                 <!-- Select your gender -->
                 <label>What is your gender?</label>
                 <div class="custom-control custom-radio">
@@ -37,8 +37,10 @@
                 
                 <!-- sexual orientation -->
                 <div>
-                    <label for="NameOfUser">Your sexual orientation</label>
-                    <div class="btn-group" role="group">
+                    <div>
+                        <label for="NameOfUser">Your sexual orientation</label>
+                    </div>
+                    <div class="btn-group">
                         <button type="button" class="btn btn-info">Guys</button>
                         <button type="button" class="btn btn-info">Girls</button>
                         <button type="button" class="btn btn-info">Both</button>
@@ -49,17 +51,17 @@
                 <div>
                     <label for="NameOfUser">My Location</label>
                     <select class="custom-select" size="3">
-                        <option value="1">Cape Town</option>
-                        <option value="2">Johannesburg</option>
-                        <option value="3">Durban</option>
-                        <option value="4">Pretoria</option>
-                        <option value="5">Port Elizabeth</option>
-                        <option value="6">Bloemfontein</option>
-                        <option value="7">East London</option>
-                        <option value="8">Soweto</option>
-                        <option value="9">Polokwane</option>
-                        <option value="10">Nelspruit</option>
-
+                        <option style="color:black;" value="1">Cape Town</option>
+                        <option style="color:black;" value="2">Johannesburg</option>
+                        <option style="color:black;" value="3">Durban</option>
+                        <option style="color:black;" value="4">Pretoria</option>
+                        <option style="color:black;" value="5">Port Elizabeth</option>
+                        <option style="color:black;" value="6">Bloemfontein</option>
+                        <option style="color:black;" value="7">East London</option>
+                        <option style="color:black;" value="8">Soweto</option>
+                        <option style="color:black;" value="9">Polokwane</option>
+                        <option style="color:black;" value="10">Nelspruit</option>
+                        
                     </select>
                 </div>
                 
@@ -82,5 +84,6 @@
             </div>
         </form>
     </div>
+</div>
 </div>
 <%- include('../partials/footer');%>

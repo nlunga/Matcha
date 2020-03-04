@@ -1,26 +1,50 @@
 <%- include('../partials/header');%>
 <h1><%= title %></h1>
-<div>
-    <form action="/signup" method="POST" name = "myForm" onsubmit = "return(validate());">
-        <p id="errorMSG"> </p>
-        <div class="container">
-            <label for="firstName">First Name</label>
-            <input type="text" name="firstName" id="firstName" placeholder="Enter your First Name" value="">
-            <label for="lastName">Last Name</label>
-            <input type="text" name="lastName" id="lastName" placeholder="Enter your Last Name" value="">
-            <label for="usename">Username</label>
-            <input type="text" name="username" id="username" placeholder="Enter a username" value="">
-            <label for="email">Email</label>
-            <input type="email" name="email" id="email" placeholder="Enter your email address" >
-            <label for="password">Password</label>
-            <input type="password" name="password" id="password" placeholder="Enter your password" value="">
-            <label for="confPass">Confirm Password </label>
-            <input type="password" name="confPass" id="confPass" placeholder="confirm your password" value="">
-            <button type="submit" name="signup">Signup</button>
-            <!-- <input type="submit" name="signup" value="signup"> -->
-        </div>
-    </form>
-</div>
+<div class="container-fluid bg">
+    <div class='row'>
+        <div class="col-md-4 col-sm-4 col-xs-12"></div>
+        <form action="/signup" method="POST"  onsubmit="return(validate());" class="form-container" id="Signup">
+            <h2>Signup</h2>
+            <p id="errorMSG"> </p>
+            
+            <div class="form-group">
+                <label for="firstName">First Name</label>
+                <input type="text" name="firstName"  class="form-control" placeholder="Enter your First Name" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="lastName">Last Name</label>
+                <input type="text" name="LastName"  class="form-control" placeholder="Enter your last name"value="">
+            </div>
+
+            <div class="form-group">
+                <label for="usename">Username</label>
+                <input type="text" name="username" class="form-control" placeholder="Enter a username" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="email">Email</label>
+                <input type="email" name="email" id="email" class="form-control" placeholder="Enter your email address" >
+            </div>
+            
+            <div class="form-group">
+                <label for="password">Password</label>
+                <input type="password" name="password" id="password" class='form-group' placeholder="Enter your password" value="">
+            </div>
+            
+            <div class="form-group">
+                <label for="confPass">Confirm Password </label>
+                <input type="password" name="confPass" id="confPass" class='form-group' placeholder="confirm your password" value="">
+            </div>
+            
+            <div class="form-group">
+                <button type="submit" class="btn btn-primary btn-lg btn-block" name="signup">Signup</button>
+            </div>
+            
+            <p>Already have an account? <a href="/login">Log In</a></p>   
+        </form>
+    </div>
+</div>       
 <script type="text/javascript">
     function checkPassword(str){
         var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
@@ -75,6 +99,4 @@
         }
     }
     </script>
-    </script>
-<p>Already have an account? <a href="/login">Log In</a></p>
 <%- include('../partials/footer');%>
