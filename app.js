@@ -101,6 +101,9 @@ app.use((req, res, next) => {
 const getRoutes = require('./routes/api');
 app.use('/api', getRoutes);
 
+const postRoutes = require('./routes/postRoutes');
+app.use('/signup', postRoutes);
+
 app.get('/', (req, res) => {
     console.log(req.user);
     console.log(req.isAuthenticated());
@@ -200,8 +203,8 @@ app.get('/reset-password', (req, res) => {
     })
 });
 
-const registerRoutes = require('./routes/register');
-app.use('/signup', registerRoutes);
+// const registerRoutes = require('./routes/register');
+// app.use('/signup', registerRoutes);
 
 const loginRoute = require('./routes/login');
 app.use('/login', loginRoute)
