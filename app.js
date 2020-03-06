@@ -5,13 +5,22 @@ const joi = require('joi');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
+const TWO_HOURS = 1000 * 60 * 60 * 2;
 // const mongo = require('mongodb');
 const app = express();
-const port = 3000;
 const options = {
     url: "mongodb://localhost:27017/Aphrodite",
     ttl: 2 * 24 * 60 * 60
 };
+const {
+    PORT = 3000,
+    SESS_LIFETIME = TWO_HOURS,
+    SESS_NAME = 'sid',
+    SESS_SECRET = 'haoPsURXAFxeB0ph',
+    NODE_ENV = 'development'
+} = process.env;
+
+const IN_PROD = NODE_ENV === 'production';
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
@@ -58,11 +67,16 @@ app.set('views', path.join(__dirname, 'views'));
 //// SETTING UP A COOKIE AND PASSPORT MIDDLEWARE
 app.set('trust proxy', 1); // trust first proxy
 app.use(session({
-  secret: 'haoPsURXAFxeB0ph',
+  name: SESS_NAME,
+  secret: SESS_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore(options)
-//   cookie: { secure: true }
+  store: new MongoStore(options),
+  cookie: {
+      maxAge : SESS_LIFETIME,
+      sameSite: true,
+      secure: IN_PROD
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -223,4 +237,4 @@ function authenticationMiddleware () {
 }
 //////////////////////////////////////////
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
