@@ -113,6 +113,27 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    const {userId} = req.session;
+    if (userId) {
+        const link ="mongodb://localhost:27017/";
+        res.locals.user =  MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db('Aphrodite');
+            dbo.collection('users').find({}).toArray(function(err, result) {
+                if (err) return console.log(err);
+                result.forEach((item, index, array) => {
+                    if (item._id === userId) {
+                        user = item._id; // TODO change data;
+                    }
+                });
+                db.close();
+            });
+        });
+    }
+    next();
+});
+
 ///////////////////////////////////////////////////////
 ///// IMPORT ROUTES
 app.use('/api', getRoutes);

@@ -27,8 +27,8 @@ const redirectDashboard = (req, res, next) => {
 }
 
 router.get('/', (req, res) => {
-    // const {userId} = req.session;
-    const userId = 1;
+    const {userId} = req.session.userId;
+
     console.log(userId);
     console.log(req.user);
     console.log(req.isAuthenticated());
@@ -40,16 +40,18 @@ router.get('/', (req, res) => {
 });
 
 router.get('/index', (req, res) => {
-    // const {userId} = req.session;
-    const userId = 1;
+    const {userId} = req.session.userId;
+    const { user } = res.locals;
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home',
-        dod : userId
+        dod : user
     });
 });
 
 router.get('/dashboard', redirectLogin, (req, res) => {
+    // const { user } = res.locals;
+    console.log(req.session.userId);
     res.render('pages/suggestion');
 });
 
@@ -61,6 +63,7 @@ router.get('/signup', redirectDashboard, (req, res) => {
 });
 
 router.post('/signup', redirectDashboard, (req, res) => {
+    // console.log(req.body);
 
     /* let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -68,88 +71,75 @@ router.post('/signup', redirectDashboard, (req, res) => {
     let email = req.body.email;
     let password = req.body.password;
     let confPass = req.body.confPass; */
-  
-    const schema = joi.object().keys({
-        firstName: joi.string().alphanum().min(3).max(30).required(),
-        lastName : joi.string().alphanum().min(3).max(30).required(),
-        username: joi.string().alphanum().min(3).max(30).required(),
-        email : joi.string().trim().email().required(),
-        password: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
-        confPass: joi.string().regex(/^[a-zA-Z0-9]{3,30}$/).required(),
-        signup: joi.required()
-    });
-    joi.validate(req.body, schema, (err, data) => {
+
         // console.log(data);
         
-        if (err) {
-            res.send("An error has occured. " + err);
-            console.log(err);
-        }else {
-            MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-                if (err) return console.log(err);
-                bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-                    const dbo = db.db('Aphrodite');
-                    const mydata = {firstName: req.body.firstName, lastName: req.body.lastName, username: req.body.username, email: req.body.email, password: hash, confirmed: "No", token: emailToken};
-                    dbo.collection('users').find({}, { projection: { _id: 0, username: 1, email: 1 } }).toArray(function(err, result) {
-                        // const dataLenght = result.length;
-                        if (err) return console.log(err);
-                        for (i = 0; i < result.length; i++) {
-                            if (result[i].username === req.body.username) {
-                                return console.log('username already exists');
-                            }else if (result[i].email === req.body.email) {
-                                return console.log('email already exists');
-                                
-                            }
-                        }
-                        dbo.collection('users').insertOne(mydata, (err, res) => {
-                            if (err) return console.log(err);
-                            // req.session.userId = _id;//TODO: get proper id
-                            console.logg("This is " + _id);
-                            console.log('1 document inserted');
-                            db.close();
-                        });
-
-                        ///////////////////////////////////
-                        ///// Email sent to the user
-                        const transporter = nodemailer.createTransport({
-                            service: 'gmail',
-                            auth: {
-                                user: 'nlunga@student.wethinkcode.co.za',
-                                pass: '9876543210khulu'
-                            }
-                        });
-                        // var emailToken = "jhdashghohwg2gwg";
-                        const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
-                        const mailOptions = {
-                            from: 'nlunga@student.wethinkcode.co.za',
-                            to: req.body.email,
-                            subject: 'Please Verify your email',
-                            text: `That was easy!`,
-                            html: `Please click on the link bellow to confirm your email:<br>
-                                   
-                            <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
-                            `
-                        };
+    if (req.body) { // TODO: validation
+        console.log(req.body);
+        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+            if (err) return console.log(err);
+            bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+                const dbo = db.db('Aphrodite');
+                const mydata = {firstName: req.body.firstName, lastName: req.body.LastName, username: req.body.username, email: req.body.email, password: hash, confirmed: "No", token: emailToken};
+                dbo.collection('users').find({}, { projection: { _id: 0, username: 1, email: 1 } }).toArray(function(err, result) {
+                    // const dataLenght = result.length;
+                    if (err) return console.log(err);
+                    for (i = 0; i < result.length; i++) {
+                        if (result[i].username === req.body.username) {
+                            return console.log('username already exists');
+                        }else if (result[i].email === req.body.email) {
+                            return console.log('email already exists');
                             
-                        transporter.sendMail(mailOptions, (error, info) => {
-                            if (error) {
-                                console.log(error);
-                            } else {
-                                console.log('Email sent: ' + info.response);
-                            }
-                        });
-                        ///////////////////////////////////
+                        }
+                    }
+                    dbo.collection('users').insertOne(mydata, (err, res) => {
+                        if (err) return console.log(err);
+                        // req.session.userId = _id;//TODO: get proper id
+                        // console.logg("This is " + _id);
+                        console.log('1 document inserted');
+                        db.close();
+                    });
+
+                    ///////////////////////////////////
+                    ///// Email sent to the user
+                    const transporter = nodemailer.createTransport({
+                        service: 'gmail',
+                        auth: {
+                            user: 'nlunga@student.wethinkcode.co.za',
+                            pass: '9876543210khulu'
+                        }
+                    });
+                    // var emailToken = "jhdashghohwg2gwg";
+                    const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
+                    const mailOptions = {
+                        from: 'nlunga@student.wethinkcode.co.za',
+                        to: req.body.email,
+                        subject: 'Please Verify your email',
+                        text: `That was easy!`,
+                        html: `Please click on the link bellow to confirm your email:<br>
+                                
+                        <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
+                        `
+                    };
                         
-                        res.render('pages/register-success', {
-                            headed: "Registration",
-                            data: req.body
-                        });
+                    transporter.sendMail(mailOptions, (error, info) => {
+                        if (error) {
+                            console.log(error);
+                        } else {
+                            console.log('Email sent: ' + info.response);
+                        }
+                    });
+                    ///////////////////////////////////
+                    
+                    res.render('pages/register-success', {
+                        headed: "Registration",
+                        data: req.body
                     });
                 });
-
             });
-        }
-    });
+
+        });
+    }
 });
 
 router.get('/login', redirectDashboard, (req, res) => {
@@ -236,21 +226,20 @@ router.get('/confirmation/:id', redirectDashboard, (req, res) =>{
                         { "confirmed" : item.confirmed, "token": token }, 
                         { $set: {"confirmed": "Yes", "token": ""} },
                         { upsert: true }
-                        );
-                        res.redirect('/login');
-                    }
-                });
-                db.close();
+                    );
+                    res.redirect('/login');
+                }
             });
+            db.close();
         });
     });
+});
     
 router.get('/logout', redirectLogin,  (req, res) => {
-    req.logout();
-    req.session.destroy();
-    res.render('pages/index',{
-        title:'Home',
-        headed: 'Home'
+    req.session.destroy( (err) => {
+        if (err) return res.redirect('/dashboard');
+        res.clearCookie(SESS_NAME);
+        res.redirect('/login')
     });
 });
 
