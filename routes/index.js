@@ -8,31 +8,59 @@ const uuidv1 = require('uuid/v1');
 const joi = require('joi');
 const saltRounds = 10;
 const emailToken = uuidv1();
+const url = 'mongodb://localhost:27017/';
+
+const redirectLogin = (req, res, next) => {
+    if (!req.session.userId) {
+        res.redirect('/login');
+    } else {
+        next();
+    }
+}
+
+const redirectDashboard = (req, res, next) => {
+    if (req.session.userId) {
+        res.redirect('/dashboard');
+    } else {
+        next();
+    }
+}
 
 router.get('/', (req, res) => {
+    // const {userId} = req.session;
+    const userId = 1;
+    console.log(userId);
     console.log(req.user);
     console.log(req.isAuthenticated());
     res.render('pages/index',{
         title:'Customers',
-        headed: 'Home'
+        headed: 'Home',
+        dod : userId
     });
 });
 
 router.get('/index', (req, res) => {
+    // const {userId} = req.session;
+    const userId = 1;
     res.render('pages/index',{
         title:'Customers',
-        headed: 'Home'
+        headed: 'Home',
+        dod : userId
     });
 });
 
-router.get('/signup', (req, res) => {
+router.get('/dashboard', redirectLogin, (req, res) => {
+    res.render('pages/suggestion');
+});
+
+router.get('/signup', redirectDashboard, (req, res) => {
     res.render('pages/signup',{
         title:'Register an account',
         headed: 'Sign Up'
     });
 });
 
-router.post('/signup', (req, res) => {
+router.post('/signup', redirectDashboard, (req, res) => {
 
     /* let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -75,6 +103,8 @@ router.post('/signup', (req, res) => {
                         }
                         dbo.collection('users').insertOne(mydata, (err, res) => {
                             if (err) return console.log(err);
+                            // req.session.userId = _id;//TODO: get proper id
+                            console.logg("This is " + _id);
                             console.log('1 document inserted');
                             db.close();
                         });
@@ -122,14 +152,14 @@ router.post('/signup', (req, res) => {
     });
 });
 
-router.get('/login', (req, res) => {
+router.get('/login', redirectDashboard, (req, res) => {
     res.render('pages/login',{
         title:'login',
         headed: 'Login'
     });
 });
 
-router.post('/login', (req, res) => {
+router.post('/login', redirectDashboard, (req, res) => {
     MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
         if (err) throw err;
         const dbo = db.db('Aphrodite');
@@ -152,11 +182,11 @@ router.post('/login', (req, res) => {
                             res.redirect("/login");
                         }else if (item.confirmed === "Yes") {
                             if (response === true) {
-                                req.login(user_id, (err) => {
-                                    res.redirect('/dashboard');
-                                });
+                                req.session.userId = item._id;
                                 console.log('loggen in');
+                                return res.redirect('/dashboard');
                             }else {
+                                res.redirect("/login");
                                 return console.log('password does not match');
                             }
                         }
@@ -172,27 +202,27 @@ router.post('/login', (req, res) => {
 
 
 
-router.get('/forgot_password', (req, res) => {
+router.get('/forgot_password', redirectDashboard, (req, res) => {
     res.render('pages/forgot_password', {
         title : 'Forgot Password',
         headed: 'Forgot Password'
     })
 });
 
-router.get('/profile', /* authenticationMiddleware(), */ (req, res) => {
+router.get('/profile', redirectLogin, (req, res) => {
     console.log(req.url);
     res.render('pages/profile', {
         headed: "profile"
     });
 });
 
-router.get('/reset-password', (req, res) => {
+router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })
 });
 
-router.get('/confirmation/:id', (req, res) =>{
+router.get('/confirmation/:id', redirectDashboard, (req, res) =>{
     const token = req.params.id;
     const link ="mongodb://localhost:27017/";
     MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
@@ -215,7 +245,7 @@ router.get('/confirmation/:id', (req, res) =>{
         });
     });
     
-router.get('/logout', (req, res) => {
+router.get('/logout', redirectLogin,  (req, res) => {
     req.logout();
     req.session.destroy();
     res.render('pages/index',{
@@ -224,18 +254,14 @@ router.get('/logout', (req, res) => {
     });
 });
 
-router.get('/dashboard', (req, res) => {
-    res.render('pages/suggestion');
-});
-
-router.get('/user-profile', (req, res) => {
+router.get('/user-profile', redirectLogin, (req, res) => {
     console.log(req.url);
     res.render('pages/user-profile', {
         headed: "User Profile"
     });
 });
 
-router.get('/reset-password', (req, res) => {
+router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })

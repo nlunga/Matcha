@@ -1,8 +1,14 @@
 <%- include('../partials/header');%>
-<h1>Welcome Home</h1>
+<h1>Welcome Home <%=(typeof dod != "undefined" ? dod : "This sucks")%></h1>
 <center>
     <div class="container">
-        <% if (isAuthenticated) {%>
+      <!--   <% //if (isAuthenticated) {%>
+            <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
+        <% //}else { %>
+            <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>
+            <a href="/signup"><button type="button" class="btn btn-outline-secondary">signup</button></a>
+        <%// } %>  -->
+        <% if (dod) {%>
             <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
         <% }else { %>
             <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>
