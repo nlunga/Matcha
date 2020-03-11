@@ -27,7 +27,7 @@ const redirectDashboard = (req, res, next) => {
 }
 
 router.get('/', (req, res) => {
-    const userId = req.session.userId;
+    const userId = req.session;
 
     console.log(userId);
     console.log(req.user);
@@ -40,12 +40,12 @@ router.get('/', (req, res) => {
 });
 
 router.get('/index', (req, res) => {
-    const userId = req.session.userId;
-    const user = res.locals;
+    const userId = req.session;
+    // const user = res.locals;
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home',
-        dod : user
+        dod : userId
     });
 });
 

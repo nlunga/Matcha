@@ -1,5 +1,5 @@
 <%- include('../partials/header');%>
-<h1>Welcome Home <%=(typeof dod != "undefined" ? dod : "This sucks")%></h1>
+<h1>Welcome Home <%=(typeof dod.username != "undefined" ? dod.username : "This sucks")%></h1>
 <center>
     <div class="container">
         <% if (dod) {%>
