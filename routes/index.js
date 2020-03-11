@@ -27,7 +27,7 @@ const redirectDashboard = (req, res, next) => {
 }
 
 router.get('/', (req, res) => {
-    const {userId} = req.session.userId;
+    const userId = req.session.userId;
 
     console.log(userId);
     console.log(req.user);
@@ -40,8 +40,8 @@ router.get('/', (req, res) => {
 });
 
 router.get('/index', (req, res) => {
-    const {userId} = req.session.userId;
-    const { user } = res.locals;
+    const userId = req.session.userId;
+    const user = res.locals;
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home',
@@ -50,9 +50,15 @@ router.get('/index', (req, res) => {
 });
 
 router.get('/dashboard', redirectLogin, (req, res) => {
-    // const { user } = res.locals;
-    console.log(req.session.userId);
-    res.render('pages/suggestion');
+    // const user = res.locals;
+    const user = req.session;
+    const  userId  = req.session.userId;
+    // console.log("This is a userId " + req.session.userId);
+    console.log("This is a userId " + userId);
+    res.render('pages/suggestion', {
+        headed: 'Dashboard',
+        dot: user
+    });
 });
 
 router.get('/signup', redirectDashboard, (req, res) => {
@@ -173,6 +179,13 @@ router.post('/login', redirectDashboard, (req, res) => {
                         }else if (item.confirmed === "Yes") {
                             if (response === true) {
                                 req.session.userId = item._id;
+                                req.session.firstName = item.firstName;
+                                req.session.lastName = item.lastName;
+                                req.session.username = item.username;
+                                req.session.email = item.email;
+                                req.session.password = item.password;
+                                req.session.confPass = item.confPass;
+                                
                                 console.log('loggen in');
                                 return res.redirect('/dashboard');
                             }else {
@@ -200,7 +213,7 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 });
 
 router.get('/profile', redirectLogin, (req, res) => {
-    console.log(req.url);
+    // console.log(req.url);
     res.render('pages/profile', {
         headed: "profile"
     });
@@ -244,9 +257,11 @@ router.get('/logout', redirectLogin,  (req, res) => {
 });
 
 router.get('/user-profile', redirectLogin, (req, res) => {
-    console.log(req.url);
+    // console.log(req.url);
+    const user = req.session;
     res.render('pages/user-profile', {
-        headed: "User Profile"
+        headed: "User Profile",
+        data: user
     });
 });
 

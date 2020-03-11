@@ -1,8 +1,8 @@
 <%- include('../partials/header');%>
 <div class="container-fluid bg">
     <nav class="navbar navbar-expand-md navbar-dark bg-dark">
-        <a href="#" class="navbar-brand">Matcha</a>
-        <a href="#" class="nav-link active">Home page</a>
+        <a href="/dashboard" class="navbar-brand">Matcha</a>
+        <a href="/logout" class="nav-link active">logout</a>
     </nav>
     <div class="row">
         
@@ -15,7 +15,7 @@
                 <!-- user name -->
                 <div class="form-group">
                     <!-- <label>Name</label> -->
-                    <input type="text" class="form-control" placeholder="Enter your name">
+                    <input type="text" class="form-control" placeholder="Enter your name" value="<%=(typeof data.firstName != "undefined" ? data.firstName : "")%>">
                 </div>
                 
                 <!-- select your age -->
