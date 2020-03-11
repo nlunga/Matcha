@@ -2,7 +2,7 @@
 <h1>Welcome Home <%=(typeof dod.username != "undefined" ? dod.username : "This sucks")%></h1>
 <center>
     <div class="container">
-        <% if (dod) {%>
+        <% if (dod.username) {%>
             <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
         <% }else { %>
             <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>

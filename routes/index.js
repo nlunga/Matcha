@@ -25,13 +25,29 @@ const redirectDashboard = (req, res, next) => {
         next();
     }
 }
+/////////////////////////////////////////////////////////////////////////
+// Revisite the middleware below -:> It is used on the login route
+/* const redirectUserProfile = (req, res, next) => {
+    const username = req.session.username;
+    MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+        if (err) throw err;
+        const dbo = db.db('Aphrodite');
+        dbo.collection('userInfo').find({}).toArray((err, result) => {
+            if (err) throw err;
+            result.forEach((item, index, array) => {
+                if (item.username === username) {
+                    return res.redirect('/dashboard');
+                }
+            });
+            res.redirect('/user-profile');
+        });
+    });
+    next();
+} */
+///////////////////////////////////////////////////////////////////////
 
 router.get('/', (req, res) => {
     const userId = req.session;
-
-    console.log(userId);
-    console.log(req.user);
-    console.log(req.isAuthenticated());
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home',
@@ -51,13 +67,10 @@ router.get('/index', (req, res) => {
 
 router.get('/dashboard', redirectLogin, (req, res) => {
     // const user = res.locals;
-    const user = req.session;
-    const  userId  = req.session.userId;
-    // console.log("This is a userId " + req.session.userId);
-    console.log("This is a userId " + userId);
+    const userId = req.session;
     res.render('pages/suggestion', {
         headed: 'Dashboard',
-        dot: user
+        dot: userId
     });
 });
 
@@ -69,7 +82,23 @@ router.get('/signup', redirectDashboard, (req, res) => {
 });
 
 router.post('/signup', redirectDashboard, (req, res) => {
+    let namePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
+    let lastNamePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
+    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/i;
+    let emailPattern = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\")){3,40}@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,6})$/i;
+    let strongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
+    let confStrongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
+    
+    let firstNameResult = namePattern.test(req.body.firstName);
+    let lastNameResult = lastNamePattern.test(req.body.LastName);
+    let usernameResult = usernamePattern.test(req.body.username);
+    let emailResult = emailPattern.test(req.body.email);
+    let passwordResult = strongPassPattern.test(req.body.password);
+    let confPasswordResult = confStrongPassPattern.test(req.body.confPass);
     // console.log(req.body);
+    console.log(req.body.password);
+    console.log(req.body.confPass+ " " + strongPassPattern.test(req.body.confPass));
+    console.log(req.body.confPass+ " " + strongPassPattern.test(req.body.confPass));
 
     /* let firstName = req.body.firstName;
     let lastName = req.body.lastName;
@@ -80,7 +109,7 @@ router.post('/signup', redirectDashboard, (req, res) => {
 
         // console.log(data);
         
-    if (req.body) { // TODO: validation
+    if (firstNameResult === true && lastNameResult === true && usernameResult === true && emailResult === true && passwordResult === true && confPasswordResult === true) { // TODO: validation
         console.log(req.body);
         MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) return console.log(err);
@@ -145,6 +174,14 @@ router.post('/signup', redirectDashboard, (req, res) => {
             });
 
         });
+    }else {
+        console.log('Invalid input');
+        console.log("This is the first name " + firstNameResult);
+        console.log("This is the last name " + lastNameResult);
+        console.log("This is the username " + usernameResult);
+        console.log("This is the email " + emailResult);
+        console.log("This is the Password " + passwordResult);
+        console.log("This is the conf password " + confPasswordResult);
     }
 });
 
@@ -155,7 +192,14 @@ router.get('/login', redirectDashboard, (req, res) => {
     });
 });
 
-router.post('/login', redirectDashboard, (req, res) => {
+router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => { //TODO : Fix the middleware above called redirectUserProfile
+
+    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/i;
+    let strongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
+
+    let usernameResult = usernamePattern.test(req.body.username);
+    let passwordResult = strongPassPattern.test(req.body.password);
+
     MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
         if (err) throw err;
         const dbo = db.db('Aphrodite');
