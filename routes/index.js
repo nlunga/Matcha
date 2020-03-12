@@ -327,6 +327,14 @@ router.get('/user-profile', redirectLogin, (req, res) => {
     });
 });
 
+router.get('/add_interest', redirectLogin, (req, res) => {
+    const user = req.session;
+    res.render('pages/add-interest', {
+        headed: "Interests",
+        data: user
+    });
+});
+
 router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
