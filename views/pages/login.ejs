@@ -26,7 +26,8 @@
 </div>
 <script type="text/javascript">
     function checkPassword(str){
-        var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
+        // var re = /^(?=.*\d)(?=.*[a-z])(?=.*[A-Z])\w{6,}$/;
+        var re = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/;
         return re.test(str);
     }
     function validate(){
@@ -41,9 +42,14 @@
         if(myForm.password.value != "" ){
             if(!checkPassword(myForm.password.value)){
                 // alert("Password must contain numbers, lowercase, uppercase letter and at least six characters");
-                MSG =("Password must contain numbers, lowercase, uppercase letter and at least six characters");
+                MSG =("Password must contain numbers, lowercase, uppercase letter<br> and at least six characters");
                 document.myForm.username.focus();
                 document.getElementById("errorMSG").innerHTML = MSG;
+                document.getElementById("errorMSG").style.color = "red";
+                document.getElementById("errorMSG").style.backgroundColor = "white";
+                document.getElementById("errorMSG").style.padding = "5px";
+                document.getElementById("errorMSG").style.opacity = ".7";
+                document.getElementById("errorMSG").style.borderRadius = "5px";
                 // myForm.password.focus();
                 return false
             }
