@@ -1,8 +1,8 @@
 <%- include('../partials/header');%>
-<h1>Welcome Home</h1>
+<h1>Welcome Home <%=(typeof dod.username != "undefined" ? dod.username : "This sucks")%></h1>
 <center>
     <div class="container">
-        <% if (isAuthenticated) {%>
+        <% if (dod.username) {%>
             <a href="/logout"><button type="button" class="btn btn-outline-secondary">logout</button></a>
         <% }else { %>
             <a href="/login"><button type="button" class="btn btn-outline-secondary">login</button></a>

@@ -5,13 +5,25 @@ const joi = require('joi');
 const session = require('express-session');
 const MongoStore = require('connect-mongo')(session);
 const passport = require('passport');
+const TWO_HOURS = 1000 * 60 * 60 * 2;
 // const mongo = require('mongodb');
 const app = express();
-const port = 3000;
 const options = {
     url: "mongodb://localhost:27017/Aphrodite",
     ttl: 2 * 24 * 60 * 60
 };
+const {
+    PORT = 3000,
+    SESS_LIFETIME = TWO_HOURS,
+    SESS_NAME = 'sid',
+    SESS_SECRET = 'haoPsURXAFxeB0ph',
+    NODE_ENV = 'development'
+} = process.env;
+
+const IN_PROD = NODE_ENV === 'production';
+
+const index = require('./routes/index');
+const getRoutes = require('./routes/api');
 
 //////////////////////////////////////////////////
 /// DATABASE CREATITION
@@ -58,11 +70,16 @@ app.set('views', path.join(__dirname, 'views'));
 //// SETTING UP A COOKIE AND PASSPORT MIDDLEWARE
 app.set('trust proxy', 1); // trust first proxy
 app.use(session({
-  secret: 'haoPsURXAFxeB0ph',
+  name: SESS_NAME,
+  secret: SESS_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore(options)
-//   cookie: { secure: true }
+  store: new MongoStore(options),
+  cookie: {
+      maxAge : SESS_LIFETIME,
+      sameSite: true,
+      secure: IN_PROD
+    }
 }));
 app.use(passport.initialize());
 app.use(passport.session());
@@ -96,128 +113,46 @@ app.use((req, res, next) => {
     next();
 });
 
+app.use((req, res, next) => {
+    const {userId} = req.session;
+    if (userId) {
+        const link ="mongodb://localhost:27017/";
+        res.locals.user =  MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db('Aphrodite');
+            dbo.collection('users').find({}).toArray(function(err, result) {
+                if (err) return console.log(err);
+                result.forEach((item, index, array) => {
+                    if (item._id === userId) {
+                        user = item._id; // TODO change data;
+                    }
+                });
+                db.close();
+            });
+        });
+    }
+    next();
+});
+
 ///////////////////////////////////////////////////////
 ///// IMPORT ROUTES
-const getRoutes = require('./routes/api');
 app.use('/api', getRoutes);
+app.use('/', index);
+///////////////////////////////////////////////////////
 
-app.get('/', (req, res) => {
-    console.log(req.user);
-    console.log(req.isAuthenticated());
-    res.render('pages/index',{
-        title:'Customers',
-        headed: 'Home'
-    });
-});
 
-app.get('/index', (req, res) => {
-    res.render('pages/index',{
-        title:'Customers',
-        headed: 'Home'
-    });
-});
 
-app.get('/signup', (req, res) => {
-    res.render('pages/signup',{
-        title:'Register an account',
-        headed: 'Sign Up'
-    });
-});
-
-app.get('/login', (req, res) => {
-    res.render('pages/login',{
-        title:'login',
-        headed: 'Login'
-    });
-});
-
-app.get('/forgot_password', (req, res) => {
-    res.render('pages/forgot_password', {
-        title : 'Forgot Password',
-        headed: 'Forgot Password'
-    })
-});
-
-app.get('/profile', authenticationMiddleware(), (req, res) => {
-    console.log(req.url);
-    res.render('pages/profile', {
-        headed: "profile"
-    });
-});
-
-app.get('/reset-password', (req, res) => {
-    res.render('pages/reset-password', {
-        headed: 'Reset Password'
-    })
-});
-
-app.get('/confirmation/:id', (req, res) =>{
-    const token = req.params.id;
-    const link ="mongodb://localhost:27017/";
-    MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db('Aphrodite');
-        dbo.collection('users').find({}).toArray(function(err, result) {
-            if (err) return console.log(err);
-            result.forEach((item, index, array) => {
-                if (item.token === token) {
-                    dbo.collection('users').updateOne(
-                        { "confirmed" : item.confirmed, "token": token }, 
-                        { $set: {"confirmed": "Yes", "token": ""} },
-                        { upsert: true }
-                    );
-                    res.redirect('/login');
-                }
-            });
-            db.close();
-        });
-    });
-});
-
-app.get('/logout', (req, res) => {
-    req.logout();
-    req.session.destroy();
-    res.render('pages/index',{
-        title:'Home',
-        headed: 'Home'
-    });
-});
-
-app.get('/see', (req, res) => {
-    res.render('pages/suggestion');
-});
-
-app.get('/user-profile', (req, res) => {
-    console.log(req.url);
-    res.render('pages/user-profile', {
-        headed: "User Profile"
-    });
-});
-
-app.get('/reset-password', (req, res) => {
-    res.render('pages/reset-password', {
-        headed: 'Reset Password'
-    })
-});
-
-const registerRoutes = require('./routes/register');
-app.use('/signup', registerRoutes);
-
-const loginRoute = require('./routes/login');
-app.use('/login', loginRoute)
-
-/////////////////////////////////////////
 //// Authentification and page restriction middleware
-function authenticationMiddleware () {
-    return (req, res, next) => {
-        console.log(`
-            req.session.passport.user: ${JSON.stringify(req.session.passport)}
-        `);
-        if (req.isAuthenticated()) return next();
+// function authenticationMiddleware () {
+//     return (req, res, next) => {
+//         console.log(`
+//             req.session.passport.user: ${JSON.stringify(req.session.passport)}
+//         `);
+//         if (req.isAuthenticated()) return next();
 
-        res.redirect('/login')
-    }
-}
+//         res.redirect('/login')
+//     }
+// }
 //////////////////////////////////////////
 
-app.listen(port, () => console.log(`Example app listening on port ${port}!`));
+app.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));
