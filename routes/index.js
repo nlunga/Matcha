@@ -229,9 +229,27 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                 req.session.email = item.email;
                                 req.session.password = item.password;
                                 req.session.confPass = item.confPass;
-                                
+                                let user = req.session;
                                 console.log('loggen in');
-                                return res.redirect('/dashboard');
+                                MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+                                    if (err) throw err;
+                                    const dbo = db.db('Aphrodite');
+                                    dbo.collection('userInfo').find({}).toArray((err, result) => {
+                                        if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
+
+                                        result.forEach((item, index, array) => {
+                                            if (item.username === req.body.username) {
+                                                return res.redirect('/dashboard');
+                                            }
+                                        });
+                                        console.log("This is the user " + user);
+                                        return res.render('pages/user-profile', {
+                                            headed: "User Profile",
+                                            data: user
+                                        });
+                                    });
+                                });
+                                // return res.redirect('/dashboard');
                             }else {
                                 res.redirect("/login");
                                 return console.log('password does not match');
