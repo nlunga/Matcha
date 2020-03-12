@@ -7,14 +7,12 @@
     <div class="row">
         
         <div class="col-md-4 col-sm-4 col-xs-12"></div>
-        <!-- <div class="col-md-4 col-sm-4 col-xs-12"> -->
             
             <form id='user-profile' method="POST" action="/see#" class="form-container">
                 <h1>Your Profile</h1>
                 
                 <!-- user name -->
                 <div class="form-group">
-                    <!-- <label>Name</label> -->
                     <input type="text" class="form-control" placeholder="Enter your name">
                 </div>
                 
@@ -37,37 +35,27 @@
                 
                 <!-- sexual orientation -->
                 <div>
+                    <label class="mdb-main-label primary">Sexual orientation</label>
                     <div>
-                        <label for="NameOfUser">Your sexual orientation</label>
-                    </div>
-                    <div class="btn-group">
-                        <button type="button" class="btn btn-info">Guys</button>
-                        <button type="button" class="btn btn-info">Girls</button>
-                        <button type="button" class="btn btn-info">Both</button>
+                        <select class="mdb-select md-form colorful-select dropdown-primary">
+                            <option value="1">Girls</option>
+                            <option value="2">Boys</option>
+                            <option value="3">Both</option>
+                        </select>
                     </div>
                 </div>
-                
                 <!-- Profile location -->
                 <div>
-                    <label for="NameOfUser">My Location</label>
-                    <select class="custom-select" size="3">
-                        <option style="color:black;" value="1">Cape Town</option>
-                        <option style="color:black;" value="2">Johannesburg</option>
-                        <option style="color:black;" value="3">Durban</option>
-                        <option style="color:black;" value="4">Pretoria</option>
-                        <option style="color:black;" value="5">Port Elizabeth</option>
-                        <option style="color:black;" value="6">Bloemfontein</option>
-                        <option style="color:black;" value="7">East London</option>
-                        <option style="color:black;" value="8">Soweto</option>
-                        <option style="color:black;" value="9">Polokwane</option>
-                        <option style="color:black;" value="10">Nelspruit</option>
-                        
-                    </select>
+                    <p class="h4 text-center" name="myLocation">My Location</p>
+                    <label for="NameOfUser">City</label>
+                    <input type="text" class="form-control" name="myCity">
+                    <label for="NameOfUser">Suburb</label>
+                    <input type="text" class="form-control" name="mySuburb">
                 </div>
                 
                 <!-- interests tags -->
                 <div class="form-group">
-                    <label>Add interests to your profile</label>
+                    <p>Add interests to your profile</p>
                     <button type="button" class="btn btn-info">Add interests</button>
                 </div>
                 
