@@ -27,11 +27,12 @@ router.post('/', (req, res) => {
             res.send("An error has occured. " + err);
             console.log(err);
         }else {
+            console.log(req.body);
             MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
                 if (err) return console.log(err);
                 bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
                     const dbo = db.db('Aphrodite');
-                    const mydata = {firstName: req.body.firstName, lastName: req.body.lastName, username: req.body.username, email: req.body.email, password: hash, confirmed: "No", token: emailToken};
+                    const mydata = {firstName: req.body.firstName, lastName: req.body.LastName, username: req.body.username, email: req.body.email, password: hash, confirmed: "No", token: emailToken};
                     dbo.collection('users').find({}, { projection: { _id: 0, username: 1, email: 1 } }).toArray(function(err, result) {
                         // const dataLenght = result.length;
                         if (err) return console.log(err);
