@@ -47,6 +47,16 @@ MongoClient.connect('mongodb://localhost:27017/', {useUnifiedTopology: true}, (e
         db.close();
     });
 });
+
+MongoClient.connect('mongodb://localhost:27017/', {useUnifiedTopology: true}, (err, db) => {
+    if (err) throw err;
+    const dbo = db.db('Aphrodite');
+    dbo.createCollection('userInfo', (err, res) => {
+        if (err) throw err;
+        console.log('userInfo Collection Created');
+        db.close();
+    });
+});
 ////////////////////////////////////////////////
 
 ///////////////////////////////////////////////

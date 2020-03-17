@@ -84,7 +84,7 @@ router.get('/signup', redirectDashboard, (req, res) => {
 router.post('/signup', redirectDashboard, (req, res) => {
     let namePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
     let lastNamePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
-    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/i;
+    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{4,29}$/i;
     let emailPattern = /^(([^<>()\[\]\.,;:\s@\"]+(\.[^<>()\[\]\.,;:\s@\"]+)*)|(\".+\")){3,40}@(([^<>()[\]\.,;:\s@\"]+\.)+[^<>()[\]\.,;:\s@\"]{2,6})$/i;
     let strongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
     let confStrongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
@@ -194,74 +194,79 @@ router.get('/login', redirectDashboard, (req, res) => {
 
 router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => { //TODO : Fix the middleware above called redirectUserProfile
 
-    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{0,29}$/i;
+    let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{4,29}$/i;
     let strongPassPattern = /^.*(?=.{8,})((?=.*[!@#$%^&*()\-_=+{};:,<.>]){1})(?=.*\d)((?=.*[a-z]){1})((?=.*[A-Z]){1}).*$/g;
 
     let usernameResult = usernamePattern.test(req.body.username);
     let passwordResult = strongPassPattern.test(req.body.password);
 
-    MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-        if (err) throw err;
-        const dbo = db.db('Aphrodite');
-        dbo.collection('users').find({}).toArray(function(err, result) {
-            // console.log(result);
-            if (err) return console.log(err);
-            result.forEach((item, index, array) => {
-                if (item.username === req.body.username && req.body.password) {
-                    const user_id = item._id;
-                    // res.render(`pages/profile`, {
-                        //     headed: req.body.username,
-                        //     username: req.body.username,
-                        //     data: req.body
-                        // });
-                        const hash = item.password;
-                        
-                    bcrypt.compare(req.body.password, hash, (err, response) => {
-                        if (item.confirmed === "No") {
-                            console.log("Please confirm your email");
-                            res.redirect("/login");
-                        }else if (item.confirmed === "Yes") {
-                            if (response === true) {
-                                req.session.userId = item._id;
-                                req.session.firstName = item.firstName;
-                                req.session.lastName = item.lastName;
-                                req.session.username = item.username;
-                                req.session.email = item.email;
-                                req.session.password = item.password;
-                                req.session.confPass = item.confPass;
-                                let user = req.session;
-                                console.log('loggen in');
-                                MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-                                    if (err) throw err;
-                                    const dbo = db.db('Aphrodite');
-                                    dbo.collection('userInfo').find({}).toArray((err, result) => {
-                                        if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
-
-                                        result.forEach((item, index, array) => {
-                                            if (item.username === req.body.username) {
-                                                return res.redirect('/dashboard');
-                                            }
-                                        });
-                                        console.log("This is the user " + user);
-                                        return res.render('pages/user-profile', {
-                                            headed: "User Profile",
-                                            data: user
+    if (usernameResult === true && passwordResult === true) {
+        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+            if (err) throw err;
+            const dbo = db.db('Aphrodite');
+            dbo.collection('users').find({}).toArray(function(err, result) {
+                // console.log(result);
+                if (err) return console.log(err);
+                result.forEach((item, index, array) => {
+                    if (item.username === req.body.username && req.body.password) {
+                        const user_id = item._id;
+                        // res.render(`pages/profile`, {
+                            //     headed: req.body.username,
+                            //     username: req.body.username,
+                            //     data: req.body
+                            // });
+                            const hash = item.password;
+                            
+                        bcrypt.compare(req.body.password, hash, (err, response) => {
+                            if (item.confirmed === "No") {
+                                console.log("Please confirm your email");
+                                res.redirect("/login");
+                            }else if (item.confirmed === "Yes") {
+                                if (response === true) {
+                                    req.session.userId = item._id;
+                                    req.session.firstName = item.firstName;
+                                    req.session.lastName = item.lastName;
+                                    req.session.username = item.username;
+                                    req.session.email = item.email;
+                                    req.session.password = item.password;
+                                    req.session.confPass = item.confPass;
+                                    let user = req.session;
+                                    console.log('loggen in');
+                                    MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+                                        if (err) throw err;
+                                        const dbo = db.db('Aphrodite');
+                                        dbo.collection('userInfo').find({}).toArray((err, result) => {
+                                            if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
+    
+                                            result.forEach((item, index, array) => {
+                                                if (item.username === req.body.username) {
+                                                    return res.redirect('/dashboard');
+                                                }
+                                            });
+                                            // console.log("This is the user " + user);
+                                            return res.render('pages/user-profile', {
+                                                headed: "User Profile",
+                                                data: user
+                                            });
                                         });
                                     });
-                                });
-                                // return res.redirect('/dashboard');
-                            }else {
-                                res.redirect("/login");
-                                return console.log('password does not match');
+                                    // return res.redirect('/dashboard');
+                                }else {
+                                    res.redirect("/login");
+                                    return console.log('password does not match');
+                                }
                             }
-                        }
-                    });
-                }else if (item.username !== req.body.username && req.body.password) {
-                    return console.log("username does not exist");
-                }
-            }); 
+                        });
+                    }else if (item.username !== req.body.username && req.body.password) {
+                        return console.log("username does not exist");
+                    }
+                }); 
+            });
         });
-    });
+    }else {
+        console.log("Invalid input");
+    }
+
 });
 
 
@@ -325,6 +330,11 @@ router.get('/user-profile', redirectLogin, (req, res) => {
         headed: "User Profile",
         data: user
     });
+});
+
+router.post('/user-profile', (req, res) => {
+    res.send(req.body);
+    console.log(req.body);
 });
 
 router.get('/add_interest', redirectLogin, (req, res) => {
