@@ -334,7 +334,30 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 
 router.post('/user-profile', (req, res) => {
     res.send(req.body);
-    console.log(req.body);
+    if (req.body) { // TODO I must do proper validation
+        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+            if (err) throw err;
+            let dbo = db.db('Aphrodite');
+            let myInfo = {username: req.body.username, firstName: req.body.firstName, lastName: req.body.lastName, age: req.body.age, gender: req.body.gender};
+            dbo.collection('userInfo').find({}).toArray(
+                (err, result) => {
+                if (err) throw err;
+                result.forEach((item, index, array) => {
+                    if (item.username === req.body.username) {
+                        return console.log('The user already exist');
+                    }
+                });
+                
+                dbo.collection('userInfo').insertOne(myInfo, (err, data) => {// TODO edit this code in order to debug the problem
+                    if (err) throw err;
+                    console.log('1 document inserted');
+                    // db.close();
+                });
+            });
+        })
+    }else {
+        console.log('Invalid input');
+    }
 });
 
 router.get('/add_interest', redirectLogin, (req, res) => {

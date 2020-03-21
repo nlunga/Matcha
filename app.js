@@ -116,6 +116,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 //////////////////////////////////////////////
 //express middleware - set Sastic path
 app.use(express.static(path.join(__dirname, 'public')));
+app.use(express.static(path.join(__dirname, '/node_modules/bootstrap/dist')));
 //////////////////////////////////////////////
 
 app.use((req, res, next) => {
