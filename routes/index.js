@@ -109,7 +109,7 @@ router.post('/signup', redirectDashboard, (req, res) => {
 
         // console.log(data);
         
-    if (firstNameResult === true && lastNameResult === true && usernameResult === true && emailResult === true && passwordResult === true && confPasswordResult === true) { // TODO: validation
+    if (firstNameResult === true && lastNameResult === true && usernameResult === true && emailResult === true && passwordResult === true && confPasswordResult === true) {
         console.log(req.body);
         MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) return console.log(err);
@@ -138,10 +138,15 @@ router.post('/signup', redirectDashboard, (req, res) => {
                     ///////////////////////////////////
                     ///// Email sent to the user
                     const transporter = nodemailer.createTransport({
+                        secure: true,
                         service: 'gmail',
                         auth: {
                             user: 'nlunga@student.wethinkcode.co.za',
                             pass: '9876543210khulu'
+                        },
+                        tls: {
+                            // do not fail on invalid certs
+                            rejectUnauthorized: false
                         }
                     });
                     // var emailToken = "jhdashghohwg2gwg";
@@ -176,12 +181,6 @@ router.post('/signup', redirectDashboard, (req, res) => {
         });
     }else {
         console.log('Invalid input');
-        console.log("This is the first name " + firstNameResult);
-        console.log("This is the last name " + lastNameResult);
-        console.log("This is the username " + usernameResult);
-        console.log("This is the email " + emailResult);
-        console.log("This is the Password " + passwordResult);
-        console.log("This is the conf password " + confPasswordResult);
     }
 });
 
@@ -232,25 +231,25 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                     req.session.confPass = item.confPass;
                                     let user = req.session;
                                     console.log('loggen in');
-                                    MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-                                        if (err) throw err;
-                                        const dbo = db.db('Aphrodite');
-                                        dbo.collection('userInfo').find({}).toArray((err, result) => {
-                                            if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
+                                    // MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+                                    //     if (err) throw err;
+                                    //     const dbo = db.db('Aphrodite');
+                                    //     dbo.collection('userInfo').find({}).toArray((err, result) => {
+                                    //         if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
     
-                                            result.forEach((item, index, array) => {
-                                                if (item.username === req.body.username) {
-                                                    return res.redirect('/dashboard');
-                                                }
-                                            });
-                                            // console.log("This is the user " + user);
-                                            return res.render('pages/user-profile', {
-                                                headed: "User Profile",
-                                                data: user
-                                            });
-                                        });
-                                    });
-                                    // return res.redirect('/dashboard');
+                                    //         result.forEach((item, index, array) => {
+                                    //             if (item.username === req.body.username) {
+                                    //                 return res.redirect('/dashboard');
+                                    //             }
+                                    //         });
+                                    //         // console.log("This is the user " + user);
+                                    //         return res.render('pages/user-profile', {
+                                    //             headed: "User Profile",
+                                    //             data: user
+                                    //         });
+                                    //     });
+                                    // });
+                                    return res.redirect('/dashboard');
                                 }else {
                                     res.redirect("/login");
                                     return console.log('password does not match');
@@ -268,9 +267,6 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
     }
 
 });
-
-
-
 
 router.get('/forgot_password', redirectDashboard, (req, res) => {
     res.render('pages/forgot_password', {
@@ -333,8 +329,8 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 });
 
 router.post('/user-profile', (req, res) => {
-    res.send(req.body);
-    if (req.body) { // TODO I must do proper validation
+    console.log(req.body);
+    /* if (req.body) { // TODO I must do proper validation
         MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) throw err;
             let dbo = db.db('Aphrodite');
@@ -345,19 +341,24 @@ router.post('/user-profile', (req, res) => {
                 result.forEach((item, index, array) => {
                     if (item.username === req.body.username) {
                         return console.log('The user already exist');
+                    }else {
+                        if (array.length === result.length) {
+                            console.log(index + " " + item.username);
+                            dbo.collection('userInfo').insertOne(myInfo, (err, data) => {// TODO edit this code in order to debug the problem
+                                if (err) throw err;
+                                console.log('1 document inserted');
+                                // db.close();
+                            });
+                        }
                     }
                 });
                 
-                dbo.collection('userInfo').insertOne(myInfo, (err, data) => {// TODO edit this code in order to debug the problem
-                    if (err) throw err;
-                    console.log('1 document inserted');
-                    // db.close();
-                });
+                db.close();
             });
         })
     }else {
         console.log('Invalid input');
-    }
+    } */
 });
 
 router.get('/add_interest', redirectLogin, (req, res) => {
