@@ -1,0 +1,73 @@
+{
+        "_id" : ObjectId("5e692659283d1930e887abc1"),
+        "firstName" : "Tommi",
+        "lastName" : "Lahren",
+        "username" : "tlahren",
+        "email" : "tommi@mail.com",
+        "password" : "$2b$10$DsOAl80wdrrm2T36HmVWxOPHshNjYV0sw.0Vj196OMIgtzUzx2Uou",
+        "confirmed" : "Yes",
+        "token" : ""
+}
+{
+        "_id" : ObjectId("5e69e535db14003764fb33f3"),
+        "firstName" : "Themba",
+        "lastName" : "Thembisa",
+        "username" : "thembani",
+        "email" : "nabenib843@mailezee.com",
+        "password" : "$2b$10$O2n1x5URZG/.mdYZrTh2QeFiXzSMozwqWFUon/pIUabPQxv50nXv6",
+        "confirmed" : "Yes",
+        "token" : ""
+}
+{
+        "_id" : ObjectId("5ec646e016822d5650492b21"),
+        "firstName" : "Trevor",
+        "lastName" : "Noah",
+        "username" : "ark29",
+        "email" : "lecirex698@whowlft.com",
+        "password" : "$2b$10$wy7PY4yQkoiUMsLb2dAVMOsX.OVB9SihhIJO2i3GJBgynt4/EiFve",
+        "userInfo" : [
+                {
+                        "age" : "",
+                        "gender" : "",
+                        "sexualOrientation" : "",
+                        "bio" : "",
+                        "interest" : ""
+                }
+        ],
+        "confirmed" : "Yes",
+        "token" : ""
+}
+{
+        "_id" : ObjectId("5ec64aa30ec1b65e3cc1ffef"),
+        "firstName" : "Tonny",
+        "lastName" : "Stark",
+        "username" : "ironman",
+        "email" : "bajox83859@prowerl.com",
+        "password" : "$2b$10$tSb5.zelUJ6ArxRryILNCuU3MiJaew7Ms8nUO9qpgIGvfHh5T0JhG",
+        "userInfo" : {
+                "age" : "",
+                "gender" : "",
+                "sexualOrientation" : "",
+                "bio" : "",
+                "interest" : ""
+        },
+        "confirmed" : "Yes",
+        "token" : ""
+}
+{
+        "_id" : ObjectId("5ec668d715c5ed4eb028fbe3"),
+        "firstName" : "John",
+        "lastName" : "Wick",
+        "username" : "week29",
+        "email" : "kaheg78135@ximtyl.com",
+        "password" : "$2b$10$vqfRhyAuHhRN.J3DCPKUn.6DwGNVG77XOUgZRBJ0FPbpks9votPYK",
+        "userInfo" : {
+                "age" : null,
+                "gender" : null,
+                "sexualOrientation" : null,
+                "bio" : null,
+                "interest" : null
+        },
+        "confirmed" : "Yes",
+        "token" : ""
+}

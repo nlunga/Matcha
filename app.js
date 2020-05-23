@@ -8,6 +8,7 @@ const passport = require('passport');
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 // const mongo = require('mongodb');
 const app = express();
+
 const options = {
     url: "mongodb://localhost:27017/Aphrodite",
     ttl: 2 * 24 * 60 * 60
