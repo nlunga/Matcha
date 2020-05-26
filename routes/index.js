@@ -337,23 +337,27 @@ router.post('/user-profile', (req, res) => {
         MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) throw err;
             let dbo = db.db('Aphrodite');
-            let myInfo = { age: req.body.age, gender: req.body.gender, sexualOrientation: req.body.sexualOrientation, bio: req.body.bio, interest: req.body.interests};
+            var myQuery = { username: req.body.username };
+            let newValues = { $set: { "userInfo.age": req.body.age, "userInfo.gender": req.body.gender, "userInfo.sexualOrientation": req.body.sexualOrientation, "userInfo.bio": req.body.bio, "userInfo.interest": req.body.interests.split(",")} };
             dbo.collection('users').find({username: req.body.username} , { projection: { _id: 0, firstName: 0, lastName: 0, email: 0, password: 0, confirmed: 0, token: 0 } }).toArray(
                 (err, result) => {
                 if (err) throw err;
                 result.forEach((item, index, array) => {
                     if (item.userInfo.age === null && item.userInfo.gender === null && item.userInfo.sexualOrientation === null && item.userInfo.bio === null && item.userInfo.interest === null) {
-                        dbo.collection("users").insertOne(myInfo, (err, data) => {
+                        dbo.collection("users").updateOne(myQuery, newValues, (err, data) => {
                             if (err) throw err;
-                            console.log('1 document inserted');
+                            console.log('1 document updated');
+                            return res.redirect('/dashboard');
                         });
+                    }else {
+                        return res.redirect('/dashboard'); // TODO fix this code
                     }
                    /*  if (item.username === req.body.username) {
                         return console.log('The user already exist');
                     }else {
                         if (array.length === result.length) {
                             console.log(index + " " + item.username);
-                            dbo.collection('userInfo').insertOne(myInfo, (err, data) => {// TODO edit this code in order to debug the problem
+                            dbo.collection('userInfo').insertOne(newValues, (err, data) => {// TODO edit this code in order to debug the problem
                                 if (err) throw err;
                                 console.log('1 document inserted');
                                 // db.close();
