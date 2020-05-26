@@ -324,42 +324,31 @@ router.get('/logout', redirectLogin,  (req, res) => {
 
 router.get('/user-profile', redirectLogin, (req, res) => {
     // console.log(req.url);
-   /*  MongoClient.connect(url, {useUnifiedTopology: true}, (err, db) => {
-        if (err) return console.log(err);
-        let dbo = db.db('Aphrodite');
-        dbo.collection('userInfo').find({}).toArray((err, result) => {
-            if (err) return console.log(err);
-            result.forEach((data, index, array) => {
-                if (data.username === req.session.username) {
-                    req.session.age = data.age;
-                    req.session.gender = data.age;
-                }
-            });
-            db.close();
-        });
-    }); */
     const user = req.session;
-    // console.log(user.age);
-    // console.log(req.session.age);
     res.render('pages/user-profile', {
         headed: "User Profile",
         data: user
     });
 });
 
-debugger;
 router.post('/user-profile', (req, res) => {
     console.log(req.body);
     if (req.body) { // TODO I must do proper validation
         MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) throw err;
             let dbo = db.db('Aphrodite');
-            let myInfo = {username: req.body.username, firstName: req.body.firstName, lastName: req.body.lastName, age: req.body.age, gender: req.body.gender};
-            dbo.collection('userInfo').find({}).toArray(
+            let myInfo = { age: req.body.age, gender: req.body.gender, sexualOrientation: req.body.sexualOrientation, bio: req.body.bio, interest: req.body.interests};
+            dbo.collection('users').find({username: req.body.username} , { projection: { _id: 0, firstName: 0, lastName: 0, email: 0, password: 0, confirmed: 0, token: 0 } }).toArray(
                 (err, result) => {
                 if (err) throw err;
                 result.forEach((item, index, array) => {
-                    if (item.username === req.body.username) {
+                    if (item.userInfo.age === null && item.userInfo.gender === null && item.userInfo.sexualOrientation === null && item.userInfo.bio === null && item.userInfo.interest === null) {
+                        dbo.collection("users").insertOne(myInfo, (err, data) => {
+                            if (err) throw err;
+                            console.log('1 document inserted');
+                        });
+                    }
+                   /*  if (item.username === req.body.username) {
                         return console.log('The user already exist');
                     }else {
                         if (array.length === result.length) {
@@ -370,7 +359,8 @@ router.post('/user-profile', (req, res) => {
                                 // db.close();
                             });
                         }
-                    }
+                    } */
+                    console.log(item);
                 });
                 
                 db.close();

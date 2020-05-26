@@ -15,14 +15,16 @@
                 <div class="form-group">
                     <input type="text" class="form-control" name="firstName" placeholder="Enter your name" value="<%=(typeof data.firstName != "undefined" ? data.firstName : "")%>">
                 </div>
+                
+                <div class="form-group">
+                    <input type="hidden" class="form-control" name="username" placeholder="Enter your name" value="<%=(typeof data.username != "undefined" ? data.username : "")%>">
+                </div>
 
-                <input type="hidden" name="username" value="<%=data.username%>">
-                <input type="hidden" name="lastName" value="<%=data.lastName%>">
                 <!-- select your age -->
                 <div class="form-group">
                     <label for="selectYourAge">Your age (between 18 and 50):</label>
-                    <input type="number" name="age" min="18" max="50" value="<%=data.age%>" placeholder="18">
-                </div>
+                    <input type="number" name="age" min="18" max="50" value="<%=data.age%>" placehlder="18">
+                </div>o
                 
                 <!-- Select your gender -->
                 <label>What is your gender?</label>
@@ -39,10 +41,11 @@
                 <div>
                     <label class="mdb-main-label primary">Sexual orientation</label>
                     <div>
-                        <select class="mdb-select md-form colorful-select dropdown-primary">
-                            <option name="girls" value="1">Girls</option>
-                            <option name="boys" value="2">Boys</option>
-                            <option name="girlsAndBoys" value="3">Both</option>
+                        <select class="mdb-select md-form colorful-select dropdown-primary" name="sexualOrientation">
+                            <option name="default" value=""></option>
+                            <option name="girls" value="girls">Girls</option>
+                            <option name="boys" value="boys">Boys</option>
+                            <option name="girlsAndBoys" value="both">Both</option>
                         </select>
                     </div>
                 </div>
@@ -62,8 +65,9 @@
                 </div> -->
                 
                 <div class="form-group">
-                    <p>Add interests to your profile</p>
-                    <a href="/add_interest"><button type="button" class="btn btn-info">Add interests</button></a>
+                    <p>Add interests to your profile (seperated by a coma)</p>
+                    <input type="text" name="interests" value="">
+                    <!-- <a href="/add_interest"><button type="button" class="btn btn-info">Add interests</button></a> -->
                 </div>
 
                 <!-- Textarea  -->
