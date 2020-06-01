@@ -65,3 +65,19 @@ span.psw {
     padding: 10px;
     background: #2d2d2d;
 } */
+
+.near-users {
+    border: 1px solid grey;
+    background-color: grey;
+    margin: 20px auto;
+    width: 80%;
+    height: 500px;
+}
+
+#near-users {
+    border: 1px solid red;
+    background-color: green;
+    margin: 20px auto;
+    width: 90%;
+    height: 600px;
+}

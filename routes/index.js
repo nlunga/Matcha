@@ -70,7 +70,7 @@ router.get('/dashboard', redirectLogin, (req, res) => {
     const userId = req.session;
     res.render('pages/suggestion', {
         headed: 'Dashboard',
-        dot: userId
+        data: userId
     });
 });
 
@@ -207,6 +207,7 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                 // console.log(result);
                 if (err) return console.log(err);
                 result.forEach((item, index, array) => {
+                    console.log(item);
                     if (item.username === req.body.username && req.body.password) {
                         const user_id = item._id;
                         const hash = item.password;
@@ -224,8 +225,11 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                     req.session.email = item.email;
                                     req.session.password = item.password;
                                     req.session.confPass = item.confPass;
-                                    req.session.gender = item.userInfo.gender;
                                     req.session.age = item.userInfo.age;
+                                    req.session.gender = item.userInfo.gender;
+                                    req.session.sexualOrientation = item.userInfo.sexualOrientation;
+                                    req.session.bio = item.userInfo.bio;
+                                    req.session.interest = item.userInfo.interest;
                                     let user = req.session;
                                     console.log('loggen in');
                                     // MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {

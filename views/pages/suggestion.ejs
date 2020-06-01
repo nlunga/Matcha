@@ -106,79 +106,19 @@
   </form>
 </div>
 </nav>
-<!-- <div class="container" style=" margin-top: 10px;">
-  <div class="row row-cols-1 row-cols-md-3">
-    <div class="col mb-4">
-      <div class="card">
-        <img src="./img/images.png" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Mpho Sugar</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Bio:</h6>
-          <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Age:</li>
-          <li class="list-group-item">Gender:</li>
-          <li class="list-group-item">Location: </li>
-          <li class="list-group-item">Interests:</li>
-        </ul>
-      </div>
-    </div>
-    <div class="col mb-4">
-      <div class="card">
-        <img src="./img/images.png" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Nakedi Mafa</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Bio:</h6>
-          <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Age:</li>
-          <li class="list-group-item">Gender:</li>
-          <li class="list-group-item">Location:</li>
-          <li class="list-group-item">Interests:</li>
-        </ul>
-      </div>
-    </div>
-    <div class="col mb-4">
-      <div class="card">
-        <img src="./img/images.png" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Thandi Moloi</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Bio:</h6>
-          <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Age:</li>
-          <li class="list-group-item">Gender:</li>
-          <li class="list-group-item">Location:</li>
-          <li class="list-group-item">Interests:</li>
-        </ul>
-      </div>
-    </div>
-    <div class="col mb-4">
-      <div class="card">
-        <img src="./img/images.png" class="card-img-top" alt="...">
-        <div class="card-body">
-          <h5 class="card-title">Musa Jele</h5>
-          <h6 class="card-subtitle mb-2 text-muted">Bio:</h6>
-          <p class="card-text">This is a longer card with supporting text below as a natural lead-in to additional content. This content is a little bit longer.</p>
-        </div>
-        <ul class="list-group list-group-flush">
-          <li class="list-group-item">Age:</li>
-          <li class="list-group-item">Gender:</li>
-          <li class="list-group-item">Location:</li>
-          <li class="list-group-item">Interests:</li>
-        </ul>
-      </div>
-    </div>
-  </div>
-</div> -->
 <div class="title">
-  <h2 class="card_h2" style="color: white;">Matcha</h2>
+  <h2 class="card_h2" style="color: white;">Love around you ...</h2>
 </div>
 
-<div class="cube pers250">
+<div id="near-users">
+  <%if (data.age !== null) {%>
+    <div class="near-users">
+      <h3><%=data.firstName%> <%=data.lastName%></h3>
+      <p>age: <%=data.age%><br><h2 onclick="displayInterests()">Interests:</h2> <div id="interests" ></div></p>
+    </div>
+  <%}%>
+</div>
+<!-- <div class="cube pers250">
   <div class="card first">
     <div class="card-body">
       <h5 class="card-title">Card title</h5>
@@ -212,7 +152,7 @@
 <div class="action">
   <button class="reject" style="color: red;"><i class="fas fa-times"></i></i></button>
   <button class="accept" style="color: red;"><i class="fas fa-heart"></i></button>
-</div>
+</div> -->
 
 <script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
 <script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
@@ -312,5 +252,17 @@
         track = false;
       });
  });
+
+  function displayInterests() {
+
+    var interests = document.getElementById("interests"); 
+    console.log(data.interests);
+    for(i = 0; i < data.interest.length; i++) { 
+      var tag = document.createElement("li");
+      var text = document.createTextNode("Hi there!");
+      tag.appendChild(text);
+    }
+    interests.appendChild(tag);
+  }
 </script>
 <%- include('../partials/header');%>

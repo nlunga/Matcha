@@ -23,7 +23,7 @@
                 <!-- select your age -->
                 <div class="form-group">
                     <label for="selectYourAge">Your age (between 18 and 50):</label>
-                    <input type="number" name="age" min="18" max="50" value="<%=data.age%>" placehlder="18">
+                    <input type="number" name="age" min="18" max="50" value="<%=(typeof data.age != "undefined" ? data.age : "")%>" placehlder="18">
                 </div>o
                 
                 <!-- Select your gender -->
