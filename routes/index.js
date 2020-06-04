@@ -1,14 +1,31 @@
 const express = require('express');
 const router = express.Router();
+var mysql = require('mysql');
 const passport = require('passport');
-const MongoClient = require('mongodb').MongoClient;
 const bcrypt = require('bcrypt');
 const nodemailer = require('nodemailer');
 const uuidv1 = require('uuid/v1');
-const joi = require('joi');
 const saltRounds = 10;
 const emailToken = uuidv1();
-const url = 'mongodb://localhost:27017/';
+
+const {
+    PORT = 3000,
+    HOST = 'localhost',
+    USER = 'root',
+    PASSWORD = '',
+    DB_NAME = 'Aphrodite',
+    SESS_SECRET = 'haoPsURXAFxeB0ph',
+    NODE_ENV = 'development'
+} = process.env;
+
+var recon = mysql.createConnection({
+    host: HOST,
+    user: USER,
+    password: PASSWORD,
+    database: DB_NAME
+});
+
+// recon.connect();
 
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
@@ -82,6 +99,7 @@ router.get('/signup', redirectDashboard, (req, res) => {
 });
 
 router.post('/signup', redirectDashboard, (req, res) => {
+    console.log(req.body);
     let namePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
     let lastNamePattern = /^[a-zA-Z]+(([',. -][a-zA-Z ])?[a-zA-Z]*)*$/g;
     let usernamePattern = /^(?!.*\.\.)(?!.*\.$)[^\W][\w.]{4,29}$/i;
@@ -111,73 +129,53 @@ router.post('/signup', redirectDashboard, (req, res) => {
         
     if (/* req.body */firstNameResult === true && lastNameResult === true && usernameResult === true && emailResult === true && passwordResult === true && confPasswordResult === true) {
         console.log(req.body);
-        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-            if (err) return console.log(err);
+        recon.connect((err) => {
+            if (err) throw err;
             bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-                const dbo = db.db('Aphrodite');
-                const mydata = {firstName: req.body.firstName, lastName: req.body.LastName, username: req.body.username, email: req.body.email, password: hash, userInfo: {age: null, gender: null, sexualOrientation: null, bio: null, interest: null}, confirmed: "No", token: emailToken};
-                dbo.collection('users').find({}, { projection: { _id: 0, username: 1, email: 1 } }).toArray(function(err, result) {
-                    // const dataLenght = result.length;
-                    if (err) return console.log(err);
-                    for (i = 0; i < result.length; i++) {
-                        if (result[i].username === req.body.username) {
-                            return console.log('username already exists');
-                        }else if (result[i].email === req.body.email) {
-                            return console.log('email already exists');
-                            
-                        }
-                    }
-                    dbo.collection('users').insertOne(mydata, (err, res) => {
-                        if (err) return console.log(err);
-                        // req.session.userId = _id;//TODO: get proper id
-                        // console.logg("This is " + _id);
-                        console.log('1 document inserted');
-                        db.close();
-                    });
+                var confirmed = 0;
+                recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [req.body.firstName, req.body.LastName, req.body.username, req.body.email, hash, confirmed, emailToken], (err, result) => {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                });
 
-                    ///////////////////////////////////
-                    ///// Email sent to the user
-                    const transporter = nodemailer.createTransport({
-                        secure: true,
-                        service: 'gmail',
-                        auth: {
-                            user: 'nlunga@student.wethinkcode.co.za',
-                            pass: '9876543210khulu'
-                        },
-                        tls: {
-                            // do not fail on invalid certs
-                            rejectUnauthorized: false
-                        }
-                    });
-                    // var emailToken = "jhdashghohwg2gwg";
-                    const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
-                    const mailOptions = {
-                        from: 'nlunga@student.wethinkcode.co.za',
-                        to: req.body.email,
-                        subject: 'Please Verify your email',
-                        text: `That was easy!`,
-                        html: `Please click on the link bellow to confirm your email:<br>
-                                
-                        <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
-                        `
-                    };
-                        
-                    transporter.sendMail(mailOptions, (error, info) => {
-                        if (error) {
-                            console.log(error);
-                        } else {
-                            console.log('Email sent: ' + info.response);
-                        }
-                    });
-                    ///////////////////////////////////
+                const transporter = nodemailer.createTransport({
+                    secure: true,
+                    service: 'gmail',
+                    auth: {
+                        user: 'nlunga@student.wethinkcode.co.za',
+                        pass: '9876543210khulu'
+                    },
+                    tls: {
+                        // do not fail on invalid certs
+                        rejectUnauthorized: false
+                    }
+                });
+                // var emailToken = "jhdashghohwg2gwg";
+                const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
+                const mailOptions = {
+                    from: 'nlunga@student.wethinkcode.co.za',
+                    to: req.body.email,
+                    subject: 'Please Verify your email',
+                    text: `That was easy!`,
+                    html: `Please click on the link bellow to confirm your email:<br>
+                            
+                    <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
+                    `
+                };
                     
-                    res.render('pages/register-success', {
-                        headed: "Registration",
-                        data: req.body
-                    });
+                transporter.sendMail(mailOptions, (error, info) => {
+                    if (error) {
+                        console.log(error);
+                    } else {
+                        console.log('Email sent: ' + info.response);
+                    }
+                });
+
+                res.render('pages/register-success', {
+                    headed: "Registration",
+                    data: req.body
                 });
             });
-
         });
     }else {
         console.log('Invalid input');
@@ -200,73 +198,59 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
     let passwordResult = strongPassPattern.test(req.body.password);
 
     if (usernameResult === true && passwordResult === true) {
-        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+        recon.connect((err) => {
             if (err) throw err;
-            const dbo = db.db('Aphrodite');
-            dbo.collection('users').find({}).toArray(function(err, result) {
-                // console.log(result);
-                if (err) return console.log(err);
-                result.forEach((item, index, array) => {
-                    console.log(item);
-                    if (item.username === req.body.username && req.body.password) {
-                        const user_id = item._id;
-                        const hash = item.password;
+            let sql = `SELECT * FROM users WHERE username = ` + mysql.escape(req.body.username);
+            recon.query(sql, (err, result) => {
+                if (err) throw err;
+                if (result[0].username === req.body.username && req.body.password) {
+                    const hash = result[0].password;
                             
-                        bcrypt.compare(req.body.password, hash, (err, response) => {
-                            if (item.confirmed === "No") {
-                                console.log("Please confirm your email");
+                    bcrypt.compare(req.body.password, hash, (err, response) => {
+                        if (result[0].verified === 0) {
+                            console.log("Please confirm your email");
+                            res.redirect("/login");
+                        }else if (result[0].verified === 1) {
+                            if (response === true) {
+                                req.session.userId = result[0].id;
+                                req.session.firstName = result[0].firstName;
+                                req.session.lastName = result[0].lastName;
+                                req.session.username = result[0].username;
+                                req.session.email = result[0].email;
+                                req.session.password = result[0].password;
+                                /* req.session.age = result[0].userInfo.age;
+                                req.session.gender = result[0].userInfo.gender;
+                                req.session.sexualOrientation = result[0].userInfo.sexualOrientation;
+                                req.session.bio = result[0].userInfo.bio;
+                                req.session.interest = result[0].userInfo.interest; */
+                                let user = req.session;
+                                console.log('loggen in');
+                                // recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
+                                recon.query(`SELECT * FROM userInfo`, (err, result) => {
+                                    if (err) throw err;
+                                    console.log(result);
+                                    /* if (result[0].age === undefined && result[0].gender === undefined && result[0].sexualOrientation === undefined && result[0].bio === undefined && result[0].interest === undefined) {
+                                            res.render('pages/user-profile', {
+                                                headed: "User Profile",
+                                                data: user
+                                            });
+                                            return 0;
+                                    }else {
+                                        return res.redirect('/dashboard');
+                                    } */
+                                });
+                               
+                                // });
+                                // return res.redirect('/dashboard');
+                            }else {
                                 res.redirect("/login");
-                            }else if (item.confirmed === "Yes") {
-                                if (response === true) {
-                                    req.session.userId = item._id;
-                                    req.session.firstName = item.firstName;
-                                    req.session.lastName = item.lastName;
-                                    req.session.username = item.username;
-                                    req.session.email = item.email;
-                                    req.session.password = item.password;
-                                    req.session.confPass = item.confPass;
-                                    req.session.age = item.userInfo.age;
-                                    req.session.gender = item.userInfo.gender;
-                                    req.session.sexualOrientation = item.userInfo.sexualOrientation;
-                                    req.session.bio = item.userInfo.bio;
-                                    req.session.interest = item.userInfo.interest;
-                                    let user = req.session;
-                                    console.log('loggen in');
-                                    // MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
-                                    //     if (err) throw err;
-                                    //     const dbo = db.db('Aphrodite');
-                                    dbo.collection('users').find({username: item.username},  { projection: { _id: 0, firstName: 0, lastName: 0, email: 0, password: 0, confirmed: 0, token: 0 } }).toArray((err, result) => {
-                                        if (err) return console.log("This is a BIG ERROR >>>>\n" + err);
-
-                                        result.forEach((item, index, array) => {
-                                            if (item.userInfo.age === null && item.userInfo.gender === null && item.userInfo.sexualOrientation === null && item.userInfo.bio === null && item.userInfo.interest === null) {
-                                                res.render('pages/user-profile', {
-                                                    headed: "User Profile",
-                                                    data: user
-                                                });
-                                                return 0;
-                                            }else {
-                                                return res.redirect('/dashboard');
-                                            }
-                                        });
-                                        // console.log("This is the user " + user);
-                                       /*  return res.render('pages/user-profile', {
-                                            headed: "User Profile",
-                                            data: user
-                                        }); */
-                                    });
-                                    // });
-                                    // return res.redirect('/dashboard');
-                                }else {
-                                    res.redirect("/login");
-                                    return console.log('password does not match');
-                                }
+                                return console.log('password does not match');
                             }
-                        });
-                    }else if (item.username !== req.body.username && req.body.password) {
-                        return console.log("username does not exist");
-                    }
-                }); 
+                        }
+                    });
+                }
+                console.log(result[0].id);
+                console.log(result[0]);
             });
         });
     }else {
@@ -296,24 +280,14 @@ router.get('/reset-password', redirectDashboard, (req, res) => {
 });
 
 router.get('/confirmation/:id', redirectDashboard, (req, res) =>{
-    const token = req.params.id;
-    const link ="mongodb://localhost:27017/";
-    MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
+    let token = req.params.id;
+    recon.connect((err) => {
         if (err) throw err;
-        const dbo = db.db('Aphrodite');
-        dbo.collection('users').find({}).toArray(function(err, result) {
-            if (err) return console.log(err);
-            result.forEach((item, index, array) => {
-                if (item.token === token) {
-                    dbo.collection('users').updateOne(
-                        { "confirmed" : item.confirmed, "token": token }, 
-                        { $set: {"confirmed": "Yes", "token": ""} },
-                        { upsert: true }
-                    );
-                    res.redirect('/login');
-                }
-            });
-            db.close();
+        let sql = `UPDATE users SET verified = 1 WHERE token = '${token}'`;
+        recon.query(sql, (err, result) => {
+          if (err) throw err;
+          console.log(result.affectedRows + " record(s) updated");
+          return res.redirect('/login');
         });
     });
 });
@@ -338,7 +312,7 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 router.post('/user-profile', (req, res) => {
     console.log(req.body);
     if (req.body) { // TODO I must do proper validation
-        MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+        /* MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
             if (err) throw err;
             let dbo = db.db('Aphrodite');
             var myQuery = { username: req.body.username };
@@ -356,24 +330,24 @@ router.post('/user-profile', (req, res) => {
                     }else {
                         return res.redirect('/dashboard'); // TODO fix this code
                     }
-                   /*  if (item.username === req.body.username) {
-                        return console.log('The user already exist');
-                    }else {
-                        if (array.length === result.length) {
-                            console.log(index + " " + item.username);
-                            dbo.collection('userInfo').insertOne(newValues, (err, data) => {// TODO edit this code in order to debug the problem
-                                if (err) throw err;
-                                console.log('1 document inserted');
-                                // db.close();
-                            });
-                        }
-                    } */
+                    // if (item.username === req.body.username) {
+                    //     return console.log('The user already exist');
+                    // }else {
+                    //     if (array.length === result.length) {
+                    //         console.log(index + " " + item.username);
+                    //         dbo.collection('userInfo').insertOne(newValues, (err, data) => {// TODO edit this code in order to debug the problem
+                    //             if (err) throw err;
+                    //             console.log('1 document inserted');
+                    //             // db.close();
+                    //         });
+                    //     }
+                    // } 
                     console.log(item);
                 });
                 
                 db.close();
             });
-        })
+        }); */
     }else {
         console.log('Invalid input');
     }
@@ -391,6 +365,22 @@ router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })
+});
+
+router.get('/createdb', (req, res) => {
+    let sql = 'CREATE DATABASE IF NOT EXISTS Aphrodite';
+    recon.query(sql, (err, result) => {
+        if (err) throw err;
+        res.send(`Database created...`);
+    });
+});
+
+router.get('/dropdb', (req, res) => {
+    let sql = 'DROP DATABASE IF EXISTS Aphrodite';
+    recon.query(sql, (err, result) => {
+        if (err) throw err;
+        res.send(`Database deleted...`);
+    });
 });
 
 /* function authenticationMiddleware () {

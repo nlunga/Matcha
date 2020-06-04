@@ -1,25 +1,33 @@
 const express = require('express');
 const bodyParser = require('body-parser');
 const path = require('path');
-const joi = require('joi');
+var mysql = require('mysql');
 const session = require('express-session');
-const MongoStore = require('connect-mongo')(session);
+const MySQLStore = require('express-mysql-session')(session);
 const passport = require('passport');
 const TWO_HOURS = 1000 * 60 * 60 * 2;
-// const mongo = require('mongodb');
 const app = express();
 
-const options = {
-    url: "mongodb://localhost:27017/Aphrodite",
-    ttl: 2 * 24 * 60 * 60
-};
+
 const {
     PORT = 3000,
     SESS_LIFETIME = TWO_HOURS,
     SESS_NAME = 'sid',
+    HOST = 'localhost',
+    USER = 'root',
+    PASSWORD = '',
+    DB_NAME = 'Aphrodite',
     SESS_SECRET = 'haoPsURXAFxeB0ph',
     NODE_ENV = 'development'
 } = process.env;
+
+const options = {
+    host: HOST,
+    port: 3306,
+    user: USER,
+    password: PASSWORD,
+    database: DB_NAME
+};
 
 const IN_PROD = NODE_ENV === 'production';
 
@@ -27,54 +35,45 @@ const index = require('./routes/index');
 const getRoutes = require('./routes/api');
 
 //////////////////////////////////////////////////
-/// DATABASE CREATITION
-const MongoClient = require('mongodb').MongoClient;
-const url = "mongodb://localhost:27017/Aphrodite";
-
-MongoClient.connect(url, {useUnifiedTopology: true} , (err, db) => {
-    if (err) throw err;
-    console.log("Database created!");
-    db.close();
+/// DATABASE CREATION
+var con = mysql.createConnection({
+    host: HOST,
+    user: USER,
+    password: PASSWORD
 });
 
-////////////////////////////////////////////////
-/// CREATING A COLLECTION
-MongoClient.connect('mongodb://localhost:27017/', {useUnifiedTopology: true}, (err, db) => {
-    if (err) throw err;
-    const dbo = db.db('Aphrodite');
-    dbo.createCollection('users', (err, res) => {
+var recon = mysql.createConnection({
+    host: HOST,
+    user: USER,
+    password: PASSWORD,
+    database: DB_NAME
+});
+
+con.connect((err) => {
+    if (err) console.log(err);
+    console.log('Connected!');
+    con.query(`CREATE DATABASE IF NOT EXISTS ${DB_NAME}`, (err, result) => {
         if (err) throw err;
-        console.log('users Collection Created');
-        db.close();
+        console.log("Database created");
+    });
+
+    var userSql = "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, verified TINYINT(4), token VARCHAR(255) NOT NULL)";
+    var userInfoSql = "CREATE TABLE IF NOT EXISTS userInfo (id INT AUTO_INCREMENT PRIMARY KEY, age INT(11), gender VARCHAR(255) NOT NULL, sexualOrientation VARCHAR(255) NOT NULL, bio VARCHAR(255) NOT NULL, interest VARCHAR(255) NOT NULL, userId INT(11) UNSIGNED NOT NULL, username VARCHAR(255) NOT NULL UNIQUE)";
+    recon.query(userSql, function (err, result) {
+      if (err) throw err;
+      console.log("User Table created");
+    });
+
+    recon.query(userInfoSql, function (err, result) {
+        if (err) throw err;
+        console.log("UserInfo Table created");
     });
 });
-
-MongoClient.connect('mongodb://localhost:27017/', {useUnifiedTopology: true}, (err, db) => {
-    if (err) throw err;
-    const dbo = db.db('Aphrodite');
-    dbo.createCollection('userInfo', (err, res) => {
-        if (err) throw err;
-        console.log('userInfo Collection Created');
-        db.close();
-    });
-});
-////////////////////////////////////////////////
 
 ///////////////////////////////////////////////
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, 'views'));
-///////////////////////////////////////////////
-
-///////////////////////////////////////////////
-// Session store on Mongodb
-// app.use(session({
-//     secret: 'JL8WMKwPJNHSQotp',
-//     store: new MongoStore(options),
-//     // proxy: true,
-//     resave: false,
-//     saveUninitialized: false
-// }));
 ///////////////////////////////////////////////
 
 ///////////////////////////////////////////////
@@ -85,7 +84,7 @@ app.use(session({
   secret: SESS_SECRET,
   resave: false,
   saveUninitialized: false,
-  store: new MongoStore(options),
+  store: new MySQLStore(options),
   cookie: {
       maxAge : SESS_LIFETIME,
       sameSite: true,
@@ -122,27 +121,6 @@ app.use(express.static(path.join(__dirname, '/node_modules/bootstrap/dist')));
 
 app.use((req, res, next) => {
     res.locals.isAuthenticated = req.isAuthenticated();
-    next();
-});
-
-app.use((req, res, next) => {
-    const {userId} = req.session;
-    if (userId) {
-        const link ="mongodb://localhost:27017/";
-        res.locals.user =  MongoClient.connect(link, { useUnifiedTopology: true }, (err, db) => {
-            if (err) throw err;
-            const dbo = db.db('Aphrodite');
-            dbo.collection('users').find({}).toArray(function(err, result) {
-                if (err) return console.log(err);
-                result.forEach((item, index, array) => {
-                    if (item._id === userId) {
-                        user = item._id; // TODO change data;
-                    }
-                });
-                db.close();
-            });
-        });
-    }
     next();
 });
 
