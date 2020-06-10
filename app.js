@@ -31,9 +31,6 @@ const options = {
 
 const IN_PROD = NODE_ENV === 'production';
 
-const index = require('./routes/index');
-const getRoutes = require('./routes/api');
-
 //////////////////////////////////////////////////
 /// DATABASE CREATION
 var con = mysql.createConnection({
@@ -58,7 +55,8 @@ con.connect((err) => {
     });
 
     var userSql = "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, verified TINYINT(4), token VARCHAR(255) NOT NULL)";
-    var userInfoSql = "CREATE TABLE IF NOT EXISTS userInfo (id INT AUTO_INCREMENT PRIMARY KEY, age INT(11), gender VARCHAR(255) NOT NULL, sexualOrientation VARCHAR(255) NOT NULL, bio VARCHAR(255) NOT NULL, interest VARCHAR(255) NOT NULL, userId INT(11) UNSIGNED NOT NULL, username VARCHAR(255) NOT NULL UNIQUE)";
+    var userInfoSql = "CREATE TABLE IF NOT EXISTS userInfo (id INT AUTO_INCREMENT PRIMARY KEY, age INT(11), gender VARCHAR(255) NOT NULL, sexualOrientation VARCHAR(255) NOT NULL, bio VARCHAR(255) NOT NULL, interest VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL UNIQUE)";
+    var imagesSql = "CREATE TABLE IF NOT EXISTS images (id INT AUTO_INCREMENT PRIMARY KEY, imagePath VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL)";
     recon.query(userSql, function (err, result) {
       if (err) throw err;
       console.log("User Table created");
@@ -68,7 +66,16 @@ con.connect((err) => {
         if (err) throw err;
         console.log("UserInfo Table created");
     });
+
+    recon.query(imagesSql, function (err, result) {
+        if (err) throw err;
+        console.log("Images Table created");
+    });
 });
+
+const index = require('./routes/index');
+const getRoutes = require('./routes/api');
+
 
 ///////////////////////////////////////////////
 // set the view engine to ejs

@@ -1,4 +1,19 @@
 <%- include('../partials/header');%>
-<h1>Welcome</h1>
+<nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a href="/dashboard" class="navbar-brand">Matcha</a>
+    <a href="/logout" class="nav-link active">logout</a>
+</nav>
 <a href="/user-profile">Edit settings</a>
+<section>
+    <h5>age:</h5> <%=data.age%><br>
+    <h5>gender:</h5> <%=data.gender%><br>
+    <h5>sexual Orientation:</h5> <%=data.sexualOrientation%><br>
+    <h5>bio:</h5> <%=data.bio%><br>
+    <h5>interests:</h5>
+    <ul>
+        <% interestValues.forEach(function(result){ %>
+            <li><%= result %></li>
+        <%  }); %>
+    </ul>
+</section>
 <%- include('../partials/footer');%>

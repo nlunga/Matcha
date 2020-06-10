@@ -3,6 +3,7 @@ const router = express.Router();
 var mysql = require('mysql');
 const passport = require('passport');
 const bcrypt = require('bcrypt');
+const multer = require('multer');
 const nodemailer = require('nodemailer');
 const uuidv1 = require('uuid/v1');
 const saltRounds = 10;
@@ -25,7 +26,9 @@ var recon = mysql.createConnection({
     database: DB_NAME
 });
 
-// recon.connect();
+recon.connect((err) => {
+    if (err) throw err;
+});
 
 const redirectLogin = (req, res, next) => {
     if (!req.session.userId) {
@@ -129,52 +132,49 @@ router.post('/signup', redirectDashboard, (req, res) => {
         
     if (/* req.body */firstNameResult === true && lastNameResult === true && usernameResult === true && emailResult === true && passwordResult === true && confPasswordResult === true) {
         console.log(req.body);
-        recon.connect((err) => {
-            if (err) throw err;
-            bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
-                var confirmed = 0;
-                recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [req.body.firstName, req.body.LastName, req.body.username, req.body.email, hash, confirmed, emailToken], (err, result) => {
-                    if (err) throw err;
-                    console.log("1 record inserted");
-                });
+        bcrypt.hash(req.body.password, saltRounds, (err, hash) => {
+            var confirmed = 0;
+            recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [req.body.firstName, req.body.LastName, req.body.username, req.body.email, hash, confirmed, emailToken], (err, result) => {
+                if (err) throw err;
+                console.log("1 record inserted");
+            });
 
-                const transporter = nodemailer.createTransport({
-                    secure: true,
-                    service: 'gmail',
-                    auth: {
-                        user: 'nlunga@student.wethinkcode.co.za',
-                        pass: '9876543210khulu'
-                    },
-                    tls: {
-                        // do not fail on invalid certs
-                        rejectUnauthorized: false
-                    }
-                });
-                // var emailToken = "jhdashghohwg2gwg";
-                const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
-                const mailOptions = {
-                    from: 'nlunga@student.wethinkcode.co.za',
-                    to: req.body.email,
-                    subject: 'Please Verify your email',
-                    text: `That was easy!`,
-                    html: `Please click on the link bellow to confirm your email:<br>
-                            
-                    <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
-                    `
-                };
-                    
-                transporter.sendMail(mailOptions, (error, info) => {
-                    if (error) {
-                        console.log(error);
-                    } else {
-                        console.log('Email sent: ' + info.response);
-                    }
-                });
+            const transporter = nodemailer.createTransport({
+                secure: true,
+                service: 'gmail',
+                auth: {
+                    user: 'nlunga@student.wethinkcode.co.za',
+                    pass: '9876543210khulu'
+                },
+                tls: {
+                    // do not fail on invalid certs
+                    rejectUnauthorized: false
+                }
+            });
+            // var emailToken = "jhdashghohwg2gwg";
+            const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
+            const mailOptions = {
+                from: 'nlunga@student.wethinkcode.co.za',
+                to: req.body.email,
+                subject: 'Please Verify your email',
+                text: `That was easy!`,
+                html: `Please click on the link bellow to confirm your email:<br>
+                        
+                <a href="${conUrl}"><button type="button" class="btn btn-outline-secondary">Confirm</button></a>
+                `
+            };
+                
+            transporter.sendMail(mailOptions, (error, info) => {
+                if (error) {
+                    console.log(error);
+                } else {
+                    console.log('Email sent: ' + info.response);
+                }
+            });
 
-                res.render('pages/register-success', {
-                    headed: "Registration",
-                    data: req.body
-                });
+            res.render('pages/register-success', {
+                headed: "Registration",
+                data: req.body
             });
         });
     }else {
@@ -198,60 +198,60 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
     let passwordResult = strongPassPattern.test(req.body.password);
 
     if (usernameResult === true && passwordResult === true) {
-        recon.connect((err) => {
+        let sql = `SELECT * FROM users WHERE username = ` + mysql.escape(req.body.username);
+        recon.query(sql, (err, result) => {
             if (err) throw err;
-            let sql = `SELECT * FROM users WHERE username = ` + mysql.escape(req.body.username);
-            recon.query(sql, (err, result) => {
-                if (err) throw err;
-                if (result[0].username === req.body.username && req.body.password) {
-                    const hash = result[0].password;
+            if (result[0].username === req.body.username && req.body.password) {
+                const hash = result[0].password;
+                        
+                bcrypt.compare(req.body.password, hash, (err, response) => {
+                    if (result[0].verified === 0) {
+                        console.log("Please confirm your email");
+                        res.redirect("/login");
+                    }else if (result[0].verified === 1) {
+                        if (response === true) {
+                            req.session.userId = result[0].id;
+                            req.session.firstName = result[0].firstName;
+                            req.session.lastName = result[0].lastName;
+                            req.session.username = result[0].username;
+                            req.session.email = result[0].email;
+                            req.session.password = result[0].password;
                             
-                    bcrypt.compare(req.body.password, hash, (err, response) => {
-                        if (result[0].verified === 0) {
-                            console.log("Please confirm your email");
+                            let user = req.session;
+                            console.log('loggen in');
+                            recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
+                                if (err) throw err;
+                                if (result.length === 0) {
+                                    res.render('pages/user-profile', {
+                                        headed: "User Profile",
+                                        data: user
+                                    });
+                                }else if (result[0].username !== req.session.username) {
+                                    res.render('pages/user-profile', {
+                                        headed: "User Profile",
+                                        data: user
+                                    });
+                                }else {
+                                    req.session.age = result[0].age;
+                                    req.session.gender = result[0].gender;
+                                    req.session.sexualOrientation = result[0].sexualOrientation;
+                                    req.session.bio = result[0].bio;
+                                    req.session.interest = result[0].interest;
+                                    return res.redirect('/dashboard');
+                                }
+                            });
+                            
+                            // });
+                            // return res.redirect('/dashboard');
+                        }else {
                             res.redirect("/login");
-                        }else if (result[0].verified === 1) {
-                            if (response === true) {
-                                req.session.userId = result[0].id;
-                                req.session.firstName = result[0].firstName;
-                                req.session.lastName = result[0].lastName;
-                                req.session.username = result[0].username;
-                                req.session.email = result[0].email;
-                                req.session.password = result[0].password;
-                                /* req.session.age = result[0].userInfo.age;
-                                req.session.gender = result[0].userInfo.gender;
-                                req.session.sexualOrientation = result[0].userInfo.sexualOrientation;
-                                req.session.bio = result[0].userInfo.bio;
-                                req.session.interest = result[0].userInfo.interest; */
-                                let user = req.session;
-                                console.log('loggen in');
-                                // recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
-                                recon.query(`SELECT * FROM userInfo`, (err, result) => {
-                                    if (err) throw err;
-                                    console.log(result);
-                                    /* if (result[0].age === undefined && result[0].gender === undefined && result[0].sexualOrientation === undefined && result[0].bio === undefined && result[0].interest === undefined) {
-                                            res.render('pages/user-profile', {
-                                                headed: "User Profile",
-                                                data: user
-                                            });
-                                            return 0;
-                                    }else {
-                                        return res.redirect('/dashboard');
-                                    } */
-                                });
-                               
-                                // });
-                                // return res.redirect('/dashboard');
-                            }else {
-                                res.redirect("/login");
-                                return console.log('password does not match');
-                            }
+                            return console.log('password does not match');
                         }
-                    });
-                }
-                console.log(result[0].id);
-                console.log(result[0]);
-            });
+                    }
+                });
+            }
+            console.log(result[0].id);
+            console.log(result[0]);
         });
     }else {
         console.log("Invalid input");
@@ -267,9 +267,34 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 });
 
 router.get('/profile', redirectLogin, (req, res) => {
-    // console.log(req.url);
+    const userData = req.session;
+    var arr = userData.interest.split(",");
+    var ret = [];
+    arr.forEach(element => {
+        var temp = element.trim();
+        ret.push(temp);
+
+    });
     res.render('pages/profile', {
-        headed: "profile"
+        headed: "profile",
+        data: userData,
+        interestValues: ret
+    });
+});
+
+router.get('/set-profilePic', redirectLogin, (req, res) => {
+    const userData = req.session;
+    var arr = userData.interest.split(",");
+    var ret = [];
+    arr.forEach(element => {
+        var temp = element.trim();
+        ret.push(temp);
+
+    });
+    res.render('pages/profile-pic', {
+        headed: "Profile Pic",
+        data: userData,
+        interestValues: ret
     });
 });
 
@@ -281,21 +306,23 @@ router.get('/reset-password', redirectDashboard, (req, res) => {
 
 router.get('/confirmation/:id', redirectDashboard, (req, res) =>{
     let token = req.params.id;
-    recon.connect((err) => {
+    let sql = `UPDATE users SET verified = 1 WHERE token = '${token}'`;
+    recon.query(sql, (err, result) => {
         if (err) throw err;
-        let sql = `UPDATE users SET verified = 1 WHERE token = '${token}'`;
-        recon.query(sql, (err, result) => {
-          if (err) throw err;
-          console.log(result.affectedRows + " record(s) updated");
-          return res.redirect('/login');
-        });
+        console.log(result.affectedRows + " record(s) updated");
+        return res.redirect('/login');
     });
+});
+
+router.post('/upload', (req, res) => {
+    console.log(req.body);
 });
     
 router.get('/logout', redirectLogin,  (req, res) => {
     req.session.destroy( (err) => {
         if (err) return res.redirect('/dashboard');
-        res.clearCookie(SESS_NAME);
+        // res.clearCookie(SESS_NAME);
+        res.clearCookie('sid');
         res.redirect('/login')
     });
 });
@@ -312,42 +339,11 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 router.post('/user-profile', (req, res) => {
     console.log(req.body);
     if (req.body) { // TODO I must do proper validation
-        /* MongoClient.connect(url, { useUnifiedTopology: true }, (err, db) => {
+        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
             if (err) throw err;
-            let dbo = db.db('Aphrodite');
-            var myQuery = { username: req.body.username };
-            let newValues = { $set: { "userInfo.age": req.body.age, "userInfo.gender": req.body.gender, "userInfo.sexualOrientation": req.body.sexualOrientation, "userInfo.bio": req.body.bio, "userInfo.interest": req.body.interests.split(",")} };
-            dbo.collection('users').find({username: req.body.username} , { projection: { _id: 0, firstName: 0, lastName: 0, email: 0, password: 0, confirmed: 0, token: 0 } }).toArray(
-                (err, result) => {
-                if (err) throw err;
-                result.forEach((item, index, array) => {
-                    if (item.userInfo.age === null && item.userInfo.gender === null && item.userInfo.sexualOrientation === null && item.userInfo.bio === null && item.userInfo.interest === null) {
-                        dbo.collection("users").updateOne(myQuery, newValues, (err, data) => {
-                            if (err) throw err;
-                            console.log('1 document updated');
-                            return res.redirect('/dashboard');
-                        });
-                    }else {
-                        return res.redirect('/dashboard'); // TODO fix this code
-                    }
-                    // if (item.username === req.body.username) {
-                    //     return console.log('The user already exist');
-                    // }else {
-                    //     if (array.length === result.length) {
-                    //         console.log(index + " " + item.username);
-                    //         dbo.collection('userInfo').insertOne(newValues, (err, data) => {// TODO edit this code in order to debug the problem
-                    //             if (err) throw err;
-                    //             console.log('1 document inserted');
-                    //             // db.close();
-                    //         });
-                    //     }
-                    // } 
-                    console.log(item);
-                });
-                
-                db.close();
-            });
-        }); */
+            console.log("1 record inserted");
+            return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
+        });
     }else {
         console.log('Invalid input');
     }

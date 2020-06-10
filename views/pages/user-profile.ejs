@@ -7,10 +7,30 @@
     <div class="row">
         
         <div class="col-md-4 col-sm-4 col-xs-12"></div>
-            
-            <form id='user-profile' method="POST" action="/user-profile" class="form-container">
+            <!-- <form class="form-container md-form" action="/upload" method="POST" enctype="multipart/form-data">
+                <div class="file-field">
+                    <div class="btn btn-primary btn-sm float-left">
+                    <span>Choose file</span>
+                    <input type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Upload your file">
+                    </div>
+                </div>
+            </form> -->
+            <form id='user-profile' method="POST" action="/user-profile" class="form-container" enctype="multipart/form-data">
+                <!-- <div class="file-field">
+                    <div class="btn btn-primary btn-sm float-left">
+                    <span>Choose file</span>
+                    <input type="file">
+                    </div>
+                    <div class="file-path-wrapper">
+                    <input class="file-path validate" type="text" placeholder="Upload your file">
+                    </div>
+                </div> -->
                 <h1>Your Profile</h1>
-                
+                Select image to upload:
+                <input type="file" name="fileToUpload" id="fileToUpload">
                 <!-- user name -->
                 <div class="form-group">
                     <input type="text" class="form-control" name="firstName" placeholder="Enter your name" value="<%=(typeof data.firstName != "undefined" ? data.firstName : "")%>">
