@@ -298,6 +298,10 @@ router.get('/set-profilePic', redirectLogin, (req, res) => {
     });
 });
 
+router.post('/set-profilePic', (req, res) => {
+    console.log(req.body);
+});
+
 router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
