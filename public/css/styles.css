@@ -139,6 +139,10 @@ body {
     opacity: 0;
     cursor: pointer;
   }
+
+  .image-title{
+      color: black;
+  }
   
   .image-upload-wrap {
     margin-top: 20px;
@@ -201,3 +205,5 @@ body {
     border: 0;
     transition: all .2s ease;
   }
+
+  .

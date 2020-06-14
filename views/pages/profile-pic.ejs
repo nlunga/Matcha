@@ -3,6 +3,11 @@
     <a href="/dashboard" class="navbar-brand">Matcha</a>
     <a href="/logout" class="nav-link active">logout</a>
 </nav>
+<!-- <form id="myform" class="form-container" action="/set-profilePic" method="POST" enctype="multipart/form-data">
+    <input type="file" name="myImage">
+    <input type="submit" value="Upload">
+</form> -->
+
 <form action="/set-profilePic" method="post" enctype="multipart/form-data">
     <div class="file-upload">
       <button class="file-upload-btn" type="button" onclick="$('.file-upload-input').trigger( 'click' )">Add Image</button>
@@ -16,43 +21,45 @@
       <div class="file-upload-content">
         <img class="file-upload-image" src="#" alt="your image" />
         <div class="image-title-wrap">
-          <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
+            <button type="button" onclick="removeUpload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button>
+            <!-- <button type="button" onclick="Upload()" class="remove-image">Remove <span class="image-title">Uploaded Image</span></button> -->
         </div>
       </div>
     </div>
 </form>
+
 <script>
     function readURL(input) {
-  if (input.files && input.files[0]) {
+    if (input.files && input.files[0]) {
+        var reader = new FileReader();
+        reader.onload = function(e) {
+        $('.image-upload-wrap').hide();
+        $('.file-upload-image').attr('src', e.target.result);
+        $('.file-upload-content').show();
+        $('.image-title').html(input.files[0].name);
+        };
+        reader.readAsDataURL(input.files[0]);
+    } else {
+        removeUpload();
+    }
+    }
+    function removeUpload() {
+    $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+    $('.file-upload-content').hide();
+    $('.image-upload-wrap').show();
+    }
 
-    var reader = new FileReader();
+    function Upload() {
+    $('.file-upload-input').replaceWith($('.file-upload-input').clone());
+    $('.file-upload-content').hide();
+    $('.image-upload-wrap').show();
+    }
 
-    reader.onload = function(e) {
-      $('.image-upload-wrap').hide();
-
-      $('.file-upload-image').attr('src', e.target.result);
-      $('.file-upload-content').show();
-
-      $('.image-title').html(input.files[0].name);
-    };
-
-    reader.readAsDataURL(input.files[0]);
-
-  } else {
-    removeUpload();
-  }
-}
-
-function removeUpload() {
-  $('.file-upload-input').replaceWith($('.file-upload-input').clone());
-  $('.file-upload-content').hide();
-  $('.image-upload-wrap').show();
-}
-$('.image-upload-wrap').bind('dragover', function () {
-		$('.image-upload-wrap').addClass('image-dropping');
-	});
-	$('.image-upload-wrap').bind('dragleave', function () {
-		$('.image-upload-wrap').removeClass('image-dropping');
-});
+    $('.image-upload-wrap').bind('dragover', function () {
+            $('.image-upload-wrap').addClass('image-dropping');
+        });
+        $('.image-upload-wrap').bind('dragleave', function () {
+            $('.image-upload-wrap').removeClass('image-dropping');
+    });
 </script>
 <%- include('../partials/footer');%>
