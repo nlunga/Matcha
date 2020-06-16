@@ -18,7 +18,7 @@
                     </div>
                 </div>
             </form> -->
-            <form id='user-profile' method="POST" action="/user-profile" class="form-container" enctype="multipart/form-data">
+            <form id='user-profile' method="POST" action="/user-profile" class="form-container">
                 <!-- <div class="file-field">
                     <div class="btn btn-primary btn-sm float-left">
                     <span>Choose file</span>
@@ -29,8 +29,6 @@
                     </div>
                 </div> -->
                 <h1>Your Profile</h1>
-                Select image to upload:
-                <input type="file" name="fileToUpload" id="fileToUpload">
                 <!-- user name -->
                 <div class="form-group">
                     <input type="text" class="form-control" name="firstName" placeholder="Enter your name" value="<%=(typeof data.firstName != "undefined" ? data.firstName : "")%>">
@@ -97,8 +95,9 @@
                 </div> 
                 
                 <!-- submit button -->
+                <a href="<%=data.link%>">Skip</a>
                 <div class="form-group">
-                    <button type="submit" class="btn btn-primary btn-lg btn-block">Submit</button>
+                    <button type="submit" name="<%=(typeof data.image != "undefined" ? "update" : "next")%>" value="<%=(typeof data.image != "undefined" ? "update" : "next")%>" class="btn btn-primary btn-lg btn-block"><%=(typeof data.image != "undefined" ? "Update" : "Next")%></button>
                 </div>
             </div>
         </form>

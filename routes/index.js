@@ -8,6 +8,23 @@ const nodemailer = require('nodemailer');
 const uuidv1 = require('uuid/v1');
 const saltRounds = 10;
 const emailToken = uuidv1();
+const path = require('path');
+
+const storage = multer.diskStorage({
+    destination: function (req, file, cb) {
+        cb(null, './public/uploads')
+    },
+    // destination: './public/uploads',
+    filename: function (req, file, cb) {
+        const uniqueSuffix = Date.now() + '-' + Math.round(Math.random() * 1E9)
+        //   cb(null, file.fieldname + '-' + uniqueSuffix)
+        cb(null, file.fieldname + '-' + Date.now() + path.extname(file.originalname))
+    }
+})
+
+const upload = multer({
+    storage: storage 
+}).single('myImage');
 
 const {
     PORT = 3000,
@@ -219,6 +236,18 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                             
                             let user = req.session;
                             console.log('loggen in');
+                            recon.query(`SELECT * FROM images WHERE username = ` + mysql.escape(result[0].username), (err, result) => {
+                                if (err) throw err;
+                                if (result.length === 0) {
+                                    return console.log('Results not found');
+                                }else if (result[0].username !== req.session.username) {
+                                    return console.log('Results not found');
+                                }else {
+                                    var imageData = result[0].imagePath.split('./public');
+                                    req.session.image = imageData[1];
+                                }
+                            });
+
                             recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
                                 if (err) throw err;
                                 if (result.length === 0) {
@@ -284,22 +313,32 @@ router.get('/profile', redirectLogin, (req, res) => {
 
 router.get('/set-profilePic', redirectLogin, (req, res) => {
     const userData = req.session;
-    var arr = userData.interest.split(",");
-    var ret = [];
-    arr.forEach(element => {
-        var temp = element.trim();
-        ret.push(temp);
+    // var arr = userData.interest.split(",");
+    // var ret = [];
+    // arr.forEach(element => {
+    //     var temp = element.trim();
+    //     ret.push(temp);
 
-    });
+    // });
     res.render('pages/profile-pic', {
         headed: "Profile Pic",
         data: userData,
-        interestValues: ret
+        // interestValues: ret
     });
 });
-
 router.post('/set-profilePic', (req, res) => {
-    console.log(req.body);
+    upload(req, res, (err) => {
+        if (err) throw err;
+        const imageName = `${req.file.destination}/${req.file.filename}`;
+        /* console.log(req.file);
+        console.log(imageName); */
+        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+        recon.query(sql, [imageName, req.session.username], (err, result) => {
+            if (err) throw err;
+            console.log('1 Document inserted');
+            return res.redirect('/dashboard');
+        })
+    });
 });
 
 router.get('/reset-password', redirectDashboard, (req, res) => {
@@ -333,6 +372,18 @@ router.get('/logout', redirectLogin,  (req, res) => {
 
 router.get('/user-profile', redirectLogin, (req, res) => {
     // console.log(req.url);
+    
+    recon.query(`SELECT * FROM images WHERE username = ` + mysql.escape(req.session.username), (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            req.session.link = '/dashboard';
+        }else if (result[0].username !== req.session.username) {
+            req.session.link = '/dashboard';
+        }else {
+            var imageData = result[0].imagePath.split('./public');
+            req.session.image = imageData[1];
+        }
+    });
     const user = req.session;
     res.render('pages/user-profile', {
         headed: "User Profile",
@@ -342,6 +393,7 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 
 router.post('/user-profile', (req, res) => {
     console.log(req.body);
+    // res.send(req.body);
     if (req.body) { // TODO I must do proper validation
         recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
             if (err) throw err;
