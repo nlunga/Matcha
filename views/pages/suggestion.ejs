@@ -106,163 +106,27 @@
   </form>
 </div>
 </nav>
-<div class="title">
+<!-- <div class="title">
   <h2 class="card_h2" style="color: white;">Love around you ...</h2>
 </div>
 
 <div id="near-users">
-  <%if (data.age !== null) {%>
+  <%//if (data.age !== null) {%>
     <div class="near-users">
-      <h3><%=data.firstName%> <%=data.lastName%></h3>
-      <p>age: <%=data.age%><br><h2 onclick="displayInterests()">Interests:</h2> <div id="interests" ></div></p>
+      <h3><%//=data.firstName%> <%=data.lastName%></h3>
+      <p>age: <%//=data.age%><br><h2 onclick="displayInterests()">Interests:</h2> <div id="interests" ></div></p>
     </div>
-  <%}%>
-</div>
-<!-- <div class="cube pers250">
-  <div class="card first">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-  </div>
-  <div class="card second">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-  </div>
-  <div class="card third">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-  </div>
-  <div class="card forth">
-    <div class="card-body">
-      <h5 class="card-title">Card title</h5>
-      <p style="font-size: 0.4rem;" class="card-text">Some quick example text to build on the card title and make up the bulk of the card's content.</p>
-      <a href="#" class="btn btn-primary">Go somewhere</a>
-    </div>
-  </div>
-</div>
-
-<div class="action">
-  <button class="reject" style="color: red;"><i class="fas fa-times"></i></i></button>
-  <button class="accept" style="color: red;"><i class="fas fa-heart"></i></button>
+  <%//}%>
 </div> -->
 
-<script src="https://code.jquery.com/jquery-3.4.1.slim.min.js" integrity="sha384-J6qa4849blE2+poT4WnyKhv5vZF5SrPo0iEjwBvKU7imGFAV0wwj1yYfoRSJoZ+n" crossorigin="anonymous"></script>
-<script src="https://cdn.jsdelivr.net/npm/popper.js@1.16.0/dist/umd/popper.min.js" integrity="sha384-Q6E9RHvbIyZFJoft+2mJbHaEWldlvI9IOYy5n3zV9zzTtmI3UksdQRVvoxMfooAo" crossorigin="anonymous"></script>
-<script src="https://stackpath.bootstrapcdn.com/bootstrap/4.4.1/js/bootstrap.min.js" integrity="sha384-wfSDF2E50Y2D1uUdj0O3uMBJnjuUD4Ih7YwaYd1iqfktj0Uod8GCExl3Og8ifwB6" crossorigin="anonymous"></script>
-<script>
- $(function(){
-   function accept(){
-     $('.card').first().addClass('accept');
-     $('body').addClass('accept');
-     var lastCard = $('</div />', {
-       "class": 'card last-card'})
-       setTimeout(function(){
-         $('body').removeClass('accept');
-         $('.card').first().remove();
-         $('.card').each(function(){
-           var newZ = parseInt($(this).css('transform').split(',')[14]) + 10;
-           var newZIndex = parseInt($(this).css('z-index')) + 1;
-           $(this).css({
-             'transform': 'translate3d(-50%, +50%, ' + newZ + 'px)',
-             'z-index': newZIndex
-           });
-         });
-         $('.cude').append(lastCard);
-       }, 300);
-   }
+<h2>Card</h2>
 
-   function reject(){
-    $('.card').first().addClass('reject');
-     $('body').addClass('reject');
-     var lastCard = $('</div />', {
-       "class": 'card last-card'})
-       setTimeout(function(){
-         $('body').removeClass('reject');
-         $('.card').first().remove();
-         $('.card').each(function(){
-           var newZ = parseInt($(this).css('transform').split(',')[14]) + 10;
-           var newZIndex = parseInt($(this).css('z-index')) + 1;
-           $(this).css({
-             'transform': 'translate3d(-50%, +50%, ' + newZ + 'px)',
-             'z-index': newZIndex
-           });
-         });
-         $('.cude').append(lastCard);
-       }, 300);
-      }
-
-      $('.accept').click(function(){
-        accept();
-      });
-      $('.reject').click(function(){
-        reject();
-      });
-
-      var mouseInitXposition;
-      var track = false;
-      $('body').mousedown(function(e){
-        if ($(e.target).hasClass('card')){
-          track = true;
-          mouseInitXposition = e.clientX;
-        }else{
-          track = false;
-        }
-      });
-      function pixelToDegree(x, width, dir){
-        var factor = 22.5/(width/2);
-        var distance;
-        if(dir > 0){
-          distance = x
-        }else{
-          distance = (width - x);
-        }
-        return distance * factor;
-      }
-      $('body').mousemove(function(e){
-        if(track){
-          if (e.pageX > mouseInitXposition){
-            $('.card').first().css({
-              'transform': 'translateY(-40%) translateZ(40px) rotateZ(' +
-              pixelToDegree(e.pageX, $('body').width(), 1) +'deg)'
-            });
-          }else{
-            $('.card').first().css({
-              'transform':'translateX(-100%) translateY(-40%) translateZ(40px rotateZ(-'
-              + pixelToDegree(e.pageX, $('body').width(), -1)+ ' deg))'
-            });
-          }
-        }
-      });
-      $('body').mouseup(function(e){
-        if(track){
-          if (e.pageX > mouseInitXposition){
-            accept();
-          }else if (e.pageX < mouseInitXposition){
-            reject();
-          }
-        }
-        track = false;
-      });
- });
-
-  function displayInterests() {
-
-    var interests = document.getElementById("interests"); 
-    console.log(data.interests);
-    for(i = 0; i < data.interest.length; i++) { 
-      var tag = document.createElement("li");
-      var text = document.createTextNode("Hi there!");
-      tag.appendChild(text);
-    }
-    interests.appendChild(tag);
-  }
-</script>
+<div class="card">
+  <img src="<%=data.image%>" alt="Avatar" style="width:100%">
+  <div class="container">
+    <h4><b><%=data.firstName%> <%=data.lastName%></b></h4> 
+    <p><%=data.age%></p>
+    
+  </div>
+</div>
 <%- include('../partials/header');%>

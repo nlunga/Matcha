@@ -1,0 +1,133 @@
+<%- include('../partials/header');%>
+  <nav class="navbar navbar-expand-md navbar-dark bg-dark">
+    <a href="#" class="navbar-brand">Matcha</a>
+    <button class="navbar-toggler" data-toggle="collapse" data-target="#navbarMenu">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarMenu">
+    <ul class="navbar-nav mx-auto">
+      <li class="nav-item">
+        <a href="#" class="nav-link active">Suggestions</a>
+      </li>
+      <li class="nav-item">
+        <a href="/profile" class="nav-link">Profile</a>
+      </li>
+      <li class="nav-item">
+          <a href="/logout" class="nav-link">logout</a>
+      </li>
+    </ul>
+
+    <form class="form-inline" action="index.html" method="post">
+      <div class="dropdown">
+        <button type="button" class="btn btn-primary dropdown-toggle btn-sm" data-toggle="dropdown" >
+          Filter:
+        </button>
+
+        <div class="dropdown-menu">
+          <h5 class="dropdown-header">Age-range:</h5>
+            <div class="form-check">
+              <label class="form-check-label" for="age18-30">
+                <input type="checkbox" class="form-check-input" id="age18-30" name="option1" value="something" checked>18-30 age
+              </label>
+            </div>
+
+            <div class="form-check">
+              <label class="form-check-label" for="age31-40">
+                <input type="checkbox" class="form-check-input" id="age31-40" name="option1" value="something">30-40 age
+              </label>
+            </div>
+
+            <div class="form-check">
+              <label class="form-check-label" for="age41-60">
+                <input type="checkbox" class="form-check-input" id="age41-60" name="option1" value="something">40-60 age
+              </label>
+            </div>
+
+            <div class="dropdown-divider"></div>
+              <h5 class="dropdown-header">Fame rate-range:</h5>
+            <div class="form-check">
+              <label class="form-check-label" for="fame1">
+                <input type="checkbox" class="form-check-input" id="check2" name="option2" value="something">1-4 Rating
+              </label>
+            </div>
+
+            <div class="form-check">
+              <label class="form-check-label" for="fame2">
+                <input type="checkbox" class="form-check-input" id="check2" name="option2" value="something">4-8 Rating
+              </label>
+            </div>
+            <div class="dropdown-divider"></div>
+              <h5 class="dropdown-header">People in your Area</h5>
+            <div class="form-check">
+              <label class="form-check-label">
+                <input type="checkbox" class="form-check-input">Location
+              </label>
+            </div>
+              <div class="dropdown-divider"></div>
+                <h5 class="dropdown-header">Sort by</h5>
+                <div class="form-check">
+                  <label class="form-check-label" for="ageSort"></label>
+                  <input type="checkbox" class="form-check-input">Age
+                </div>
+
+                <div class="form-check">
+                  <label class="form-check-label" for="LocationSort"></label>
+                  <input type="checkbox" class="form-check-input">Location
+                </div>
+
+
+                <div class="form-check">
+                  <label class="form-check-label" for=""></label>
+                  <input type="checkbox" class="form-check-input">Famerate
+                </div>
+
+                <h6 class="dropdown-header">Sort by Interests:</h6>
+                <div class="form-check">
+                  <label class="form-check-label" for=""></label>
+                  <input type="checkbox" class="form-check-input">Sport
+                </div>
+
+                <div class="form-check">
+                  <label class="form-check-label" for=""></label>
+                  <input type="checkbox" class="form-check-input">Movies
+                </div>
+
+                <div class="form-check">
+                  <label class="form-check-label" for=""></label>
+                  <input type="checkbox" class="form-check-input">Games
+                </div>
+                  <div class="dropdown-divider"></div>
+        </div>
+      </div> &nbsp
+    <input class="form-control mr-sm-2" type="search" placeholder="Search"
+    aria-label="Search">
+    <button class="btn btn-light my-sm-0" type="submit">Search</button>
+  </form>
+</div>
+</nav>
+<div class="title">
+  <h2 class="card_h2" style="color: white;">Loving you ...</h2>
+</div>
+
+<div id="near-users">
+  <%if (data.age !== null) {%>
+    <div class="near-users">
+      <h3><%=data.firstName%> <%=data.lastName%></h3>
+      <p>age: <%=data.age%><br><h2 onclick="displayInterests()">Interests:</h2> <div id="interests" ></div></p>
+    </div>
+  <%}%>
+</div>
+
+<h2>Card</h2>
+
+<div class="card">
+  <img src="img_avatar.png" alt="Avatar" style="width:100%">
+  <div class="container">
+    <h4><b>John Doe</b></h4> 
+    <p>Architect & Engineer</p>
+    
+  </div>
+</div>
+
+<%- include('../partials/header');%>
