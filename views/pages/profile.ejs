@@ -11,10 +11,12 @@
     <h5>sexual Orientation:</h5> <%=data.sexualOrientation%><br>
     <h5>bio:</h5> <%=data.bio%><br>
     <h5>interests:</h5>
-    <ul>
-        <% interestValues.forEach(function(result){ %>
-            <li><%= result %></li>
-        <%  }); %>
-    </ul>
+    <%if (interestValues !== undefined) {%>
+        <ul>
+            <% interestValues.forEach(function(result){ %>
+                <li><%= result %></li>
+            <%  }); %>
+        </ul>
+    <%}%>
 </section>
 <%- include('../partials/footer');%>

@@ -297,13 +297,15 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 
 router.get('/profile', redirectLogin, (req, res) => {
     const userData = req.session;
-    var arr = userData.interest.split(",");
-    var ret = [];
-    arr.forEach(element => {
-        var temp = element.trim();
-        ret.push(temp);
+    if (userData.interest !== undefined) {
+        var arr = userData.interest.split(",");
+        var ret = [];
+        arr.forEach(element => {
+            var temp = element.trim();
+            ret.push(temp);
 
-    });
+        });
+    }
     res.render('pages/profile', {
         headed: "profile",
         data: userData,
@@ -394,7 +396,7 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 router.post('/user-profile', (req, res) => {
     console.log(req.body);
     // res.send(req.body);
-    if (req.body) { // TODO I must do proper validation
+    /* if (req.body) { // TODO I must do proper validation
         recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
             if (err) throw err;
             console.log("1 record inserted");
@@ -402,7 +404,7 @@ router.post('/user-profile', (req, res) => {
         });
     }else {
         console.log('Invalid input');
-    }
+    } */
 });
 
 router.get('/add_interest', redirectLogin, (req, res) => {
