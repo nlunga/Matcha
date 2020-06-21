@@ -394,9 +394,8 @@ router.get('/user-profile', redirectLogin, (req, res) => {
 });
 
 router.post('/user-profile', (req, res) => {
-    console.log(req.body);
-    // res.send(req.body);
-    /* if (req.body) { // TODO I must do proper validation
+    // console.log(req.body);
+    if (req.body) { // TODO I must do proper validation
         recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
             if (err) throw err;
             console.log("1 record inserted");
@@ -404,8 +403,23 @@ router.post('/user-profile', (req, res) => {
         });
     }else {
         console.log('Invalid input');
-    } */
+    }
 });
+
+router.post('/searchResult', (req, res) => {
+    // console.log(req.body);
+    if (req.body) {
+        let sql = `SELECT * FROM users WHERE username = ` + mysql.escape(req.body.searchResult);
+        recon.query(sql, (err, result) => {
+            if (err) throw err;
+            
+        });
+    }
+});
+
+/* router.post('/index.html', (req, res) => {
+    console.log(req.body);
+}); */
 
 router.get('/add_interest', redirectLogin, (req, res) => {
     const user = req.session;
