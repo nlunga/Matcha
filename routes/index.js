@@ -104,10 +104,16 @@ router.get('/index', (req, res) => {
 
 router.get('/dashboard', redirectLogin, (req, res) => {
     // const user = res.locals;
-    const userId = req.session;
-    res.render('pages/suggestion', {
-        headed: 'Dashboard',
-        data: userId
+    var userId = req.session;
+    console.log(userId.otherUser);
+    recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+       if (err) throw err;
+    //    console.log(result); 
+       res.render('pages/suggestion', {
+           headed: 'Dashboard',
+           data: userId,
+           users: result
+       });
     });
 });
 
@@ -247,7 +253,55 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                     req.session.image = imageData[1];
                                 }
                             });
+/////////////////////////////////////////// Other Users /////////////////////////////////////////////////////////////////////////////////
+                            recon.query(`SELECT * FROM images WHERE username != ` + mysql.escape(result[0].username), (err, result) => {
+                                if (err) throw err;
+                                if (result.length === 0) {
+                                    return console.log('Results not found');
+                                }else {
+                                    // var imageData = result[0].imagePath.split('./public');
+                                    req.session.Otherimages = result;
+                                }
+                            });
 
+                            recon.query(`SELECT * FROM userInfo WHERE username != ` + mysql.escape(result[0].username) , (err, result) => {
+                                if (err) throw err;
+                                if (result.length === 0) {
+                                    return console.log('Results not found');
+                                }else {
+                                    /* req.session.otherAge = [];
+                                    req.session.otherGender = [];
+                                    req.session.otherSexualOrientation = [];
+                                    req.session.otherBio = [];
+                                    req.session.otherInterest = [];
+                                    req.session.otherUsername = []; */
+                                    req.session.otherUser = [];
+                                    result.forEach((item, index, array) => {
+                                        var obj = {
+                                            "otherAge": result[index].age,
+                                            "otherGender": result[index].gender,
+                                            "otherSexualOrientation": result[index].sexualOrientation,
+                                            "otherBio": result[index].bio,
+                                            "otherInterest": result[index].interest,
+                                            "otherUsername": result[index].username
+                                        }
+                                        req.session.otherUser.push(obj);
+                                        
+                                        /* req.session.otherAge.push(result[index].age);
+                                        req.session.otherGender.push(result[index].gender);
+                                        req.session.otherSexualOrientation.push(result[index].sexualOrientation);
+                                        req.session.otherBio.push(result[index].bio);
+                                        req.session.otherInterest.push(result[index].interest);
+                                        req.session.otherUsername.push(result[index].username); */
+                                    });
+                                    // req.session.otherAge =
+                                    // req.session.otherGender = result;
+                                    // req.session.otherSexualOrientation = result;
+                                    // req.session.otherBio = result;
+                                    // req.session.otherInterest = result;
+                                }
+                            });
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                             recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
                                 if (err) throw err;
                                 if (result.length === 0) {
@@ -279,8 +333,8 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                     }
                 });
             }
-            console.log(result[0].id);
-            console.log(result[0]);
+            // console.log(result[0].id);
+            // console.log(result[0]);
         });
     }else {
         console.log("Invalid input");
