@@ -21,7 +21,7 @@
           <a href="#" class="dropbtn">
             <!-- Dropdown<i class="fa fa-caret-down"></i> -->
             <!-- Notifications<i class="fa fa-bell" aria-hidden="true"></i> -->
-            <i class="fa fa-bell" aria-hidden="true"></i>
+            <i class="fa fa-bell" style="color: grey;" aria-hidden="true"></i>
           </a>
           <div class="dropdown-content">
             <a href="#">Link 1</a>
@@ -150,6 +150,12 @@
                 <h4><b><%=params.otherFirstName%> <%=params.otherLastName%></b></h4>
                 <p><%=user.otherAge%></p>
                 <a href="/like/liketo=<%=params.otherUserUsername%>/likefrom=<%=data.username%>"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+                <a href="/view/viewfrom=<%=data.username%>/viewto=<%=params.otherUserUsername%>">
+                  <i class="fa fa-eye" aria-hidden="true"></i>
+                </a>
+                <a href="#">
+                  <i class="fa fa-star" style="color:gold;" aria-hidden="true"></i>
+                </a>
               </div>
             </div>
           <% } %>

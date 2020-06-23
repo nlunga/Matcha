@@ -9,6 +9,7 @@ const uuidv1 = require('uuid/v1');
 const saltRounds = 10;
 const emailToken = uuidv1();
 const path = require('path');
+const { userInfo } = require('os');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -523,11 +524,38 @@ router.get('/like/:to/:from', (req, res) => {
 
 });
 
-router.get('/add_interest', redirectLogin, (req, res) => {
+router.get('/view/:from/:to', redirectLogin, (req, res) => {
+    console.log(req.params.from);
+    console.log(req.params.to);
+    var from = req.params.from.split("viewfrom=");
+    var to = req.params.to.split("viewto=");
+    recon.query(`SELECT firstName, lastName FROM users WHERE username = '${to[1]}'`,(err, result) => {
+        if (err) throw err;
+        req.session.viewedName = result[0].firstName;
+        req.session.viewedLast = result[0].lastName;
+    });
+
+    recon.query(`SELECT * FROM userInfo WHERE username = '${to[1]}'`,(err, result) => {
+        if (err) throw err;
+        req.session.userInfo = result[0];
+    });
+
+    recon.query(`SELECT * FROM images WHERE username = '${to[1]}'`,(err, result) => {
+        if (err) throw err;
+        var testImage = result[0].imagePath.split('./public');
+        req.session.viewedImages = testImage[1];
+    });
     const user = req.session;
-    res.render('pages/add-interest', {
+    console.log(user)
+    res.render('pages/view-profile', {
         headed: "Interests",
-        data: user
+        data: user,
+        beingViewed: to,
+        viewer: from,
+        /* firstName: viewedName,
+        lastName: viewedLast,
+        images: images,
+        userInfo: userInfo */
     });
 });
 
