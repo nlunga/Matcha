@@ -57,6 +57,7 @@ con.connect((err) => {
     var userSql = "CREATE TABLE IF NOT EXISTS users (id INT AUTO_INCREMENT PRIMARY KEY, firstName VARCHAR(255) NOT NULL, lastName VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL UNIQUE, email VARCHAR(255) NOT NULL UNIQUE, password VARCHAR(255) NOT NULL, verified TINYINT(4), token VARCHAR(255) NOT NULL)";
     var userInfoSql = "CREATE TABLE IF NOT EXISTS userInfo (id INT AUTO_INCREMENT PRIMARY KEY, age INT(11), gender VARCHAR(255) NOT NULL, sexualOrientation VARCHAR(255) NOT NULL, bio VARCHAR(255) NOT NULL, interest VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL UNIQUE)";
     var imagesSql = "CREATE TABLE IF NOT EXISTS images (id INT AUTO_INCREMENT PRIMARY KEY, imagePath VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL)";
+    var likesSql = "CREATE TABLE IF NOT EXISTS likes (id INT AUTO_INCREMENT PRIMARY KEY, likeFrom VARCHAR(255) NOT NULL, likeTo VARCHAR(255) NOT NULL, likeEachOther TINYINT(4))";
     recon.query(userSql, function (err, result) {
       if (err) throw err;
       console.log("User Table created");
@@ -70,6 +71,11 @@ con.connect((err) => {
     recon.query(imagesSql, function (err, result) {
         if (err) throw err;
         console.log("Images Table created");
+    });
+
+    recon.query(likesSql, function (err, result) {
+        if (err) throw err;
+        console.log("likes Table created");
     });
 });
 

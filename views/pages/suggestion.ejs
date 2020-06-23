@@ -124,14 +124,24 @@
   <%//}%>
 </div> -->
 
-<!-- <h2>Card</h2> -->
+<% data.otherUser.forEach(function(user){ %>
+    <% data.peopleNames.forEach(function(params){ %> 
+      <% if (params.otherUserUsername === user.otherUsername) {%>
+        <% data.otherImages.forEach(function(image) { %>
+          <% if (params.otherUserUsername === image.username) {%>
+            <!-- <div class="card"> -->
+            <div>
+              <img src="<%=image.imagePath%>" class="displayProfilePic" alt="Avatar" >
+              <div class="container">
+                <h4><b><%=params.otherFirstName%> <%=params.otherLastName%></b></h4>
+                <p><%=user.otherAge%></p>
+                <a href="/like/liketo=<%=params.otherUserUsername%>/likefrom=<%=data.username%>"><i class="fa fa-thumbs-up" aria-hidden="true"></i></a>
+              </div>
+            </div>
+          <% } %>
+        <% }); %>
+      <% } %>
+    <% }); %>
+<% }); %>
 
-<div class="card">
-  <img src="<%=data.image%>" alt="Avatar" style="width:100%">
-  <div class="container">
-    <h4><b><%=data.firstName%> <%=data.lastName%></b></h4> 
-    <p><%=data.age%></p>
-    
-  </div>
-</div>
 <%- include('../partials/header');%>

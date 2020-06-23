@@ -105,14 +105,13 @@ router.get('/index', (req, res) => {
 router.get('/dashboard', redirectLogin, (req, res) => {
     // const user = res.locals;
     var userId = req.session;
-    console.log(userId.otherUser);
+    console.log(userId);
     recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
        if (err) throw err;
     //    console.log(result); 
        res.render('pages/suggestion', {
            headed: 'Dashboard',
-           data: userId,
-           users: result
+           data: userId
        });
     });
 });
@@ -254,28 +253,37 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                 }
                             });
 /////////////////////////////////////////// Other Users /////////////////////////////////////////////////////////////////////////////////
+
+                            req.session.otherImages = [];
+                            
                             recon.query(`SELECT * FROM images WHERE username != ` + mysql.escape(result[0].username), (err, result) => {
                                 if (err) throw err;
                                 if (result.length === 0) {
                                     return console.log('Results not found');
                                 }else {
                                     // var imageData = result[0].imagePath.split('./public');
-                                    req.session.Otherimages = result;
+                                    // req.session.otherImages = result;
+
+                                    result.forEach((item, index, array) => {
+                                        var images = result[index].imagePath.split('./public');
+                                        var obj = {
+                                            "id": result[index].id,
+                                            "imagePath": images[1],
+                                            "username": result[index].username
+                                        }
+                                        req.session.otherImages.push(obj);
+                                    });
                                 }
                             });
+
+                            req.session.otherUser = [];
 
                             recon.query(`SELECT * FROM userInfo WHERE username != ` + mysql.escape(result[0].username) , (err, result) => {
                                 if (err) throw err;
                                 if (result.length === 0) {
                                     return console.log('Results not found');
                                 }else {
-                                    /* req.session.otherAge = [];
-                                    req.session.otherGender = [];
-                                    req.session.otherSexualOrientation = [];
-                                    req.session.otherBio = [];
-                                    req.session.otherInterest = [];
-                                    req.session.otherUsername = []; */
-                                    req.session.otherUser = [];
+                                    // req.session.otherUser = [];
                                     result.forEach((item, index, array) => {
                                         var obj = {
                                             "otherAge": result[index].age,
@@ -286,19 +294,25 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                             "otherUsername": result[index].username
                                         }
                                         req.session.otherUser.push(obj);
-                                        
-                                        /* req.session.otherAge.push(result[index].age);
-                                        req.session.otherGender.push(result[index].gender);
-                                        req.session.otherSexualOrientation.push(result[index].sexualOrientation);
-                                        req.session.otherBio.push(result[index].bio);
-                                        req.session.otherInterest.push(result[index].interest);
-                                        req.session.otherUsername.push(result[index].username); */
                                     });
-                                    // req.session.otherAge =
-                                    // req.session.otherGender = result;
-                                    // req.session.otherSexualOrientation = result;
-                                    // req.session.otherBio = result;
-                                    // req.session.otherInterest = result;
+                                }
+                            });
+
+                            req.session.peopleNames = [];
+
+                            recon.query(`SELECT * FROM users WHERE username != ` + mysql.escape(result[0].username) , (err, result) => {
+                                if (err) throw err;
+                                if (result.length === 0) {
+                                    return console.log('Results not found');
+                                }else {
+                                    result.forEach((item, index, array) => {
+                                        var other = {
+                                            "otherFirstName": result[index].firstName,
+                                            "otherLastName": result[index].lastName,
+                                            "otherUserUsername": result[index].username
+                                        }
+                                        req.session.peopleNames.push(other);
+                                    });
                                 }
                             });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
@@ -471,9 +485,43 @@ router.post('/searchResult', (req, res) => {
     }
 });
 
-/* router.post('/index.html', (req, res) => {
-    console.log(req.body);
-}); */
+router.get('/like/:to/:from', (req, res) => {
+    var to = req.params.to.split('liketo=');
+    var from = req.params.from.split('likefrom=');
+    var likeTo = to[1];
+    var likeFrom = from[1];
+    
+    recon.query(`SELECT * FROM likes WHERE likeFrom = '${likeFrom}' AND likeTo = '${likeTo}' LIMIT 1`, (err, result) => {
+        if (err) throw err;
+        // console.log(result);
+        if (result.length === 0) {
+            recon.query(`SELECT * FROM likes WHERE likeFrom = '${likeTo}' AND likeTo = '${likeFrom}' LIMIT 1`, (err, result) => {
+                if (err) throw err;
+                if (result.length === 0) {
+                    recon.query("INSERT INTO likes (likeFrom, likeTo, likeEachOther) VALUES (?, ?, ?)", [likeFrom, likeTo, 0], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                        //TODO redirect to chat
+                    });
+                }else {
+                    recon.query("INSERT INTO likes (likeFrom, likeTo, likeEachOther) VALUES (?, ?, ?)", [likeFrom, likeTo, 1], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                        //TODO redirect to chat
+                    });
+
+                    recon.query(`UPDATE likes SET likeEachOther = 1 WHERE likeFrom = '${likeTo}' AND likeTo = '${likeFrom}' LIMIT 1`, (err, result) => {
+                        if (err) throw err;
+                        console.log(result.affectedRows + ' record(s) updated');
+                    });
+                }
+            });
+        }else {
+            console.log(result)
+        }
+    });
+
+});
 
 router.get('/add_interest', redirectLogin, (req, res) => {
     const user = req.session;
