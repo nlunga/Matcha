@@ -24,9 +24,16 @@
             <i class="fa fa-bell" aria-hidden="true"></i>
           </a>
           <div class="dropdown-content">
-            <a href="#">Link 1</a>
+            <!-- <a href="#">Link 1</a>
             <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
+            <a href="#">Link 3</a> -->
+            <!-- <a href="#"> -->
+              <% if (data.notifications !== undefined) { %>
+                    <% data.notifications.forEach(function (result) { %>
+                      <a href="#"><%=result%></a>
+                    <% }) %>
+              <% } %>
+            <!-- </a> -->
           </div>
         </div>
     </li>

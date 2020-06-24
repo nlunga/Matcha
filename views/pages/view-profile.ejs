@@ -10,27 +10,32 @@
             <i class="fa fa-bell" style="color: grey;" aria-hidden="true"></i>
           </a>
           <div class="dropdown-content">
-            <a href="#">Link 1</a>
+            <!-- <a href="#">Link 1</a>
             <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
+            <a href="#">Link 3</a> -->
+            <% if (getNotified !== undefined) { %>
+              <% getNotified.forEach(function (result) { %>
+                <a href="#"><%=result%></a>
+              <% }) %>
+            <% } %>
           </div>
         </div>
     <!-- </li> -->
 </nav>
 <section>
-    <img class="profileImage" src="<%=data.viewedImages%>" alt="profilePic">
-    <!-- <h5>age:</h5> <%=//data.age%><br>
-    <h5>gender:</h5> <%=//data.gender%><br>
-    <h5>sexual Orientation:</h5> <%=//data.sexualOrientation%><br>
-    <h5>bio:</h5> <%=//data.bio%><br>
+    <img class="profileImage" src="<%=images%>" alt="profilePic">
+    <h5>age:</h5> <%=age%><br>
+    <h5>gender:</h5> <%=gender%><br>
+    <h5>sexual Orientation:</h5> <%=sexualOrientation%><br>
+    <h5>bio:</h5> <%=bio%><br>
     <h5>interests:</h5>
-    <//if (interestValues !== undefined) {%>
+    <%if (interest !== undefined) {%>
         <ul>
-            <%// interestValues.forEach(function(result){ %>
-                <li><%=// result %></li>
-            <%// }); %>
+            <% interest.forEach(function(result){ %>
+                <li><%= result %></li>
+            <% }); %>
         </ul>
-    <%// } %> -->
+    <% } %>
 </section>
 
 <%- include('../partials/footer');%>

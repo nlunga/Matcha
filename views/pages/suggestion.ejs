@@ -24,9 +24,17 @@
             <i class="fa fa-bell" style="color: grey;" aria-hidden="true"></i>
           </a>
           <div class="dropdown-content">
-            <a href="#">Link 1</a>
+            <!-- <a href="#">Link 1</a>
             <a href="#">Link 2</a>
-            <a href="#">Link 3</a>
+            <a href="#">Link 3</a> -->
+            <% if (getNotified !== undefined) { %>
+              <% getNotified.forEach(function (result) { %>
+                <a href="/view/viewfrom=<%=data.username%>/viewto=posiblematch">
+                  <!-- <a href="/view/viewfrom=<%//=data.username%>/viewto=<%//=params.otherUserUsername%>"> -->
+                  <%=result%>
+                </a>
+              <% }) %>
+            <% } %>
           </div>
         </div>
     </li>

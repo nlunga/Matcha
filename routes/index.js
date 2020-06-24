@@ -96,23 +96,35 @@ router.get('/', (req, res) => {
 router.get('/index', (req, res) => {
     const userId = req.session;
     // const user = res.locals;
+    var notify = [];
+    userId.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
+
     res.render('pages/index',{
         title:'Customers',
         headed: 'Home',
-        dod : userId
+        dod : userId,
+        getNotified: notify
     });
 });
 
 router.get('/dashboard', redirectLogin, (req, res) => {
     // const user = res.locals;
     var userId = req.session;
-    console.log(userId);
+    // console.log(userId.notifications[1].messages);
+    var notify = [];
+    userId.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
     recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
-       if (err) throw err;
-    //    console.log(result); 
+        if (err) throw err;
+        //    console.log(result); 
+        console.log(notify);
        res.render('pages/suggestion', {
            headed: 'Dashboard',
-           data: userId
+           data: userId,
+           getNotified: notify
        });
     });
 });
@@ -316,6 +328,19 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                     });
                                 }
                             });
+
+                            recon.query(`SELECT notifyUser, messages FROM notifications WHERE notifyUser = ` + mysql.escape(result[0].username) , (err, result) => {
+                                if (err) throw err;
+                                console.log(result);
+                                if (result.length === 0) {
+                                    return console.log('Results not found');
+                                }else {
+                                    // result.forEach((item, index, array) => {
+                                    //     console.log(item);
+                                    // });
+                                    req.session.notifications = result;
+                                }
+                            });
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                             recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
                                 if (err) throw err;
@@ -366,6 +391,12 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 
 router.get('/profile', redirectLogin, (req, res) => {
     const userData = req.session;
+
+    var notify = [];
+    userData.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
+
     if (userData.interest !== undefined) {
         var arr = userData.interest.split(",");
         var ret = [];
@@ -378,7 +409,8 @@ router.get('/profile', redirectLogin, (req, res) => {
     res.render('pages/profile', {
         headed: "profile",
         data: userData,
-        interestValues: ret
+        interestValues: ret,
+        getNotified: notify
     });
 });
 
@@ -391,9 +423,15 @@ router.get('/set-profilePic', redirectLogin, (req, res) => {
     //     ret.push(temp);
 
     // });
+    var notify = [];
+    userData.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
+
     res.render('pages/profile-pic', {
         headed: "Profile Pic",
         data: userData,
+        getNotified: notify
         // interestValues: ret
     });
 });
@@ -456,9 +494,16 @@ router.get('/user-profile', redirectLogin, (req, res) => {
         }
     });
     const user = req.session;
+
+    var notify = [];
+    user.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
+
     res.render('pages/user-profile', {
         headed: "User Profile",
-        data: user
+        data: user,
+        getNotified: notify
     });
 });
 
@@ -504,11 +549,27 @@ router.get('/like/:to/:from', (req, res) => {
                         console.log("1 record inserted");
                         //TODO redirect to chat
                     });
+
+                    recon.query(`SELECT firstName, lastName FROM users WHERE username = '${from[1]}'`,(err, result) => {
+                        if (err) throw err;
+                        recon.query("INSERT INTO notifications (notifyUser, messages) VALUES (?, ?)", [to[1], `${result[0].firstName} ${result[0].lastName} liked your profile`], (err, result) => {
+                            if (err) throw err;
+                            console.log("1 record inserted");
+                        });
+                    });
                 }else {
                     recon.query("INSERT INTO likes (likeFrom, likeTo, likeEachOther) VALUES (?, ?, ?)", [likeFrom, likeTo, 1], (err, result) => {
                         if (err) throw err;
                         console.log("1 record inserted");
                         //TODO redirect to chat
+                    });
+
+                    recon.query(`SELECT firstName, lastName FROM users WHERE username = '${from[1]}'`,(err, result) => {
+                        if (err) throw err;
+                        recon.query("INSERT INTO notifications (notifyUser, messages) VALUES (?, ?)", [to[1], `${result[0].firstName} ${result[0].lastName} liked your profile`], (err, result) => {
+                            if (err) throw err;
+                            console.log("1 record inserted");
+                        });
                     });
 
                     recon.query(`UPDATE likes SET likeEachOther = 1 WHERE likeFrom = '${likeTo}' AND likeTo = '${likeFrom}' LIMIT 1`, (err, result) => {
@@ -525,37 +586,75 @@ router.get('/like/:to/:from', (req, res) => {
 });
 
 router.get('/view/:from/:to', redirectLogin, (req, res) => {
-    console.log(req.params.from);
-    console.log(req.params.to);
     var from = req.params.from.split("viewfrom=");
     var to = req.params.to.split("viewto=");
-    recon.query(`SELECT firstName, lastName FROM users WHERE username = '${to[1]}'`,(err, result) => {
+    recon.query("INSERT INTO views (viewer, viewed) VALUES (?, ?)", [from[1], to[1]], (err, result) => {
         if (err) throw err;
-        req.session.viewedName = result[0].firstName;
-        req.session.viewedLast = result[0].lastName;
+            console.log("1 record inserted");
     });
 
-    recon.query(`SELECT * FROM userInfo WHERE username = '${to[1]}'`,(err, result) => {
+    recon.query(`SELECT firstName, lastName FROM users WHERE username = '${from[1]}'`,(err, result) => {
         if (err) throw err;
-        req.session.userInfo = result[0];
+        recon.query("INSERT INTO notifications (notifyUser, messages) VALUES (?, ?)", [to[1], `${result[0].firstName} ${result[0].lastName} viewed your profile`], (err, result) => {
+            if (err) throw err;
+            console.log("1 record inserted");
+        });
     });
-
-    recon.query(`SELECT * FROM images WHERE username = '${to[1]}'`,(err, result) => {
-        if (err) throw err;
-        var testImage = result[0].imagePath.split('./public');
-        req.session.viewedImages = testImage[1];
-    });
+    
+    
     const user = req.session;
-    console.log(user)
+
+    user.otherUser.forEach((item, index, array) => {
+        if (item.otherUsername === to[1]) {
+            global.toAge = item.otherAge;
+            global.toGender = item.otherGender;
+            global.toSexualOrientation = item.otherSexualOrientation;
+            global.toBio = item.otherBio;
+            if (item.otherInterest !== undefined) {
+                var arr = item.otherInterest.split(",");
+                global.toInterest = [];
+                arr.forEach(element => {
+                    var temp = element.trim();
+                    global.toInterest.push(temp);
+                    
+                });
+            }
+        }
+    });
+    
+    user.otherImages.forEach((item, index, array) => {
+        if (item.username === to[1]) {
+            global.imagePath = item.imagePath;
+        }
+    });
+    
+    user.peopleNames.forEach((item, index, array) => {
+        if (item.otherUserUsername === to[1]) {
+            global.toFirstName = item.otherFirstName;
+            global.toLastName = item.otherLastName;
+        }
+    });
+
+    var notify = [];
+
+    user.notifications.forEach((item, index, array) => {
+        notify.push(item.messages);
+    });
+    
     res.render('pages/view-profile', {
-        headed: "Interests",
+        headed: `${toFirstName} ${toLastName}'s Profile`,
         data: user,
         beingViewed: to,
         viewer: from,
-        /* firstName: viewedName,
-        lastName: viewedLast,
-        images: images,
-        userInfo: userInfo */
+        firstName: toFirstName,
+        lastName: toLastName,
+        age: toAge,
+        images: imagePath,
+        gender: toGender,
+        sexualOrientation: toSexualOrientation,
+        bio: toBio,
+        interest: toInterest,
+        getNotified: notify
     });
 });
 
