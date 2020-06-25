@@ -531,6 +531,10 @@ router.post('/searchResult', (req, res) => {
     }
 });
 
+router.post('/search-filter', (req, res) => {
+    console.log(req.body);
+});
+
 router.get('/like/:to/:from', (req, res) => {
     var to = req.params.to.split('liketo=');
     var from = req.params.from.split('likefrom=');
