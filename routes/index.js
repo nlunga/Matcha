@@ -113,20 +113,33 @@ router.get('/dashboard', redirectLogin, (req, res) => {
     // const user = res.locals;
     var userId = req.session;
     // console.log(userId.notifications[1].messages);
-    var notify = [];
-    userId.notifications.forEach((item, index, array) => {
-        notify.push(item.messages);
-    });
-    recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
-        if (err) throw err;
-        //    console.log(result); 
-        console.log(notify);
-       res.render('pages/suggestion', {
-           headed: 'Dashboard',
-           data: userId,
-           getNotified: notify
-       });
-    });
+    if (userId.notifications !== undefined) {
+        var notify = [];
+        userId.notifications.forEach((item, index, array) => {
+            notify.push(item.messages);
+        });
+        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+            if (err) throw err;
+            //    console.log(result); 
+            console.log(notify);
+           res.render('pages/suggestion', {
+               headed: 'Dashboard',
+               data: userId,
+               getNotified: notify
+           });
+        });
+    }else {
+        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+            if (err) throw err;
+            //    console.log(result); 
+            console.log(notify);
+           res.render('pages/suggestion', {
+               headed: 'Dashboard',
+               data: userId,
+               getNotified: undefined
+           });
+        });
+    }
 });
 
 router.get('/signup', redirectDashboard, (req, res) => {
