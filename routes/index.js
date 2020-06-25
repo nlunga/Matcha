@@ -119,8 +119,6 @@ router.get('/dashboard', redirectLogin, (req, res) => {
     });
     recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
         if (err) throw err;
-        //    console.log(result); 
-        console.log(notify);
        res.render('pages/suggestion', {
            headed: 'Dashboard',
            data: userId,
