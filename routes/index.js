@@ -110,9 +110,8 @@ router.get('/index', (req, res) => {
 });
 
 router.get('/dashboard', redirectLogin, (req, res) => {
-    // const user = res.locals;
     var userId = req.session;
-    // console.log(userId.notifications[1].messages);
+
     if (userId.notifications !== undefined) {
         var notify = [];
         userId.notifications.forEach((item, index, array) => {
@@ -120,8 +119,6 @@ router.get('/dashboard', redirectLogin, (req, res) => {
         });
         recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
             if (err) throw err;
-            //    console.log(result); 
-            console.log(notify);
            res.render('pages/suggestion', {
                headed: 'Dashboard',
                data: userId,
@@ -131,8 +128,6 @@ router.get('/dashboard', redirectLogin, (req, res) => {
     }else {
         recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
             if (err) throw err;
-            //    console.log(result); 
-            console.log(notify);
            res.render('pages/suggestion', {
                headed: 'Dashboard',
                data: userId,
@@ -545,7 +540,25 @@ router.post('/searchResult', (req, res) => {
 });
 
 router.post('/search-filter', (req, res) => {
-    console.log(req.body);
+    // ageRange, fameRange, distanceRange, ageSort, distanceSort, fameSort, username 
+    // console.log(typeof req.body.ageSort);
+    // console.log(req.session.username);
+    recon.query(`SELECT * FROM searchFilter WHERE username = '${req.session.username}' LIMIT 1`, (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            recon.query("INSERT INTO searchFilter (ageRange, fameRange, distanceRange, ageSort, distanceSort, fameSort, username) VALUES (?, ?, ?, ?, ?, ?, ?)", [req.body.ageRange, req.body.fameRange, req.body.distanceRange, typeof req.body.ageSort === undefined ? "" : req.body.ageSort, typeof req.body.distanceSort === undefined ? "" : req.body.distanceSort, typeof req.body.fameSort === undefined ? "" : req.body.fameSort, req.session.username], (err, result) => {
+                if (err) throw err;
+                console.log("1 record inserted");
+                return res.redirect('/dashboard');
+            });
+        }else {
+            // console.log(result);
+            recon.query(`UPDATE searchFilter SET ageRange = ${req.body.ageRange}, fameRange = ${req.body.fameRange}, distanceRange = ${req.body.distanceRange}, ageSort = ${req.body.ageSort}, distanceSort = ${req.body.distanceSort}, fameSort = ${req.body.fameSort} WHERE username = '${req.session.username}'`,(err, result) => {
+                if (err) throw err;
+                console.log(result.affectedRows + ' record(s) updated');
+            });
+        }
+    });
 });
 
 router.get('/like/:to/:from', (req, res) => {
@@ -673,6 +686,34 @@ router.get('/view/:from/:to', redirectLogin, (req, res) => {
         interest: toInterest,
         getNotified: notify
     });
+});
+
+router.get('/chat', (req, res) => {
+    var userId = req.session;
+
+    if (userId.notifications !== undefined) {
+        var notify = [];
+        userId.notifications.forEach((item, index, array) => {
+            notify.push(item.messages);
+        });
+        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+            if (err) throw err;
+           res.render('pages/chat_room', {
+               headed: 'Chat Room',
+               data: userId,
+               getNotified: notify
+           });
+        });
+    }else {
+        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+            if (err) throw err;
+           res.render('pages/chat_room', {
+               headed: 'Chat Room',
+               data: userId,
+               getNotified: undefined
+           });
+        });
+    }
 });
 
 router.get('/reset-password', redirectDashboard, (req, res) => {

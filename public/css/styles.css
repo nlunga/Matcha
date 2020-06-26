@@ -86,8 +86,11 @@ span.psw {
 /* ////////////////////////////////////////// UPLOAD IMAGE STYLE //////////////////////////////////////////////////////// */
 
 body {
+  margin: 0;
+  padding: 0;
+  background: url('/img/laura-vinck-Hyu76loQLdk-unsplash.jpg')no-repeat center center fixed;
+  background-size: cover;
   font-family: sans-serif;
-  background-color: #eeeeee;
 }
   
 .file-upload {
