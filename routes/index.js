@@ -399,11 +399,12 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 
 router.get('/profile', redirectLogin, (req, res) => {
     const userData = req.session;
-
-    var notify = [];
-    userData.notifications.forEach((item, index, array) => {
-        notify.push(item.messages);
-    });
+    if (userData.notifications !== undefined) {
+        var notify = [];
+        userData.notifications.forEach((item, index, array) => {
+            notify.push(item.messages);
+        });
+    }
 
     if (userData.interest !== undefined) {
         var arr = userData.interest.split(",");
