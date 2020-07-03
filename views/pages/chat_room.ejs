@@ -15,79 +15,71 @@
     <script class="jsbin" src="https://ajax.googleapis.com/ajax/libs/jquery/1/jquery.min.js"></script>
     <title><%=headed%></title>
     <style>
-        /* * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font: 13px Helvetica, Arial; }
-        form { background: #000; padding: 3px; position: fixed; bottom: 0; width: 100%; }
-        form input { border: 0; padding: 10px; width: 90%; margin-right: 0.5%; }
-        form button { width: 9%; background: rgb(130, 224, 255); border: none; padding: 10px; }
-        #messages { list-style-type: none; margin: 0; padding: 0; }
-        #messages li { padding: 5px 10px; }
-        #messages li:nth-child(odd) { background: #eee; } */
         h2{
-    font-size: 18px;
-    padding: 10px 20px;
-    color: #575ed8;
-}
+            font-size: 18px;
+            padding: 10px 20px;
+            color: #575ed8;
+        }
 
-#matcha-chat{
-    max-width: 600px;
-    margin: 30px auto;
-    border: 1px solid #ddd;
-    box-shadow: 1px 3px 5px rgba(0,0,0,0.05);
-    border-radius: 2px;
-}
+        #matcha-chat{
+            max-width: 600px;
+            margin: 30px auto;
+            border: 1px solid #ddd;
+            box-shadow: 1px 3px 5px rgba(0,0,0,0.05);
+            border-radius: 2px;
+        }
 
-#chat-window{
-    height: 400px;
-    overflow: auto;
-    background: #f9f9f9;
-}
+        #chat-window{
+            height: 400px;
+            overflow: auto;
+            background: #f9f9f9;
+        }
 
-#output p{
-    padding: 14px 0px;
-    margin: 0 20px;
-    border-bottom: 1px solid #e9e9e9;
-    color: #555;
-}
+        #output p{
+            padding: 14px 0px;
+            margin: 0 20px;
+            border-bottom: 1px solid #e9e9e9;
+            color: #555;
+        }
 
-#feedback p{
-    color: #aaa;
-    padding: 14px 0px;
-    margin: 0 20px;
-}
+        #feedback p{
+            color: #aaa;
+            padding: 14px 0px;
+            margin: 0 20px;
+        }
 
-#output strong{
-    color: #575ed8;
-}
+        #output strong{
+            color: #575ed8;
+        }
 
-label{
-    box-sizing: border-box;
-    display: block;
-    padding: 10px 20px;
-}
+        label{
+            box-sizing: border-box;
+            display: block;
+            padding: 10px 20px;
+        }
 
-input{
-    padding: 10px 20px;
-    box-sizing: border-box;
-    background: #eee;
-    border: 0;
-    display: block;
-    width: 100%;
-    background: #fff;
-    border-bottom: 1px solid #eee;
-    font-family: Nunito;
-    font-size: 16px;
-}
+        input{
+            padding: 10px 20px;
+            box-sizing: border-box;
+            background: #eee;
+            border: 0;
+            display: block;
+            width: 100%;
+            background: #fff;
+            border-bottom: 1px solid #eee;
+            font-family: Nunito;
+            font-size: 16px;
+        }
 
-button{
-    background: #575ed8;
-    color: #fff;
-    font-size: 18px;
-    border: 0;
-    padding: 12px 0;
-    width: 100%;
-    border-radius: 0 0 2px 2px;
-}
+        button{
+            background: #575ed8;
+            color: #fff;
+            font-size: 18px;
+            border: 0;
+            padding: 12px 0;
+            width: 100%;
+            border-radius: 0 0 2px 2px;
+        }
     </style>
 </head>
 <body>
@@ -95,6 +87,7 @@ button{
     <a href="/dashboard" class="navbar-brand">Matcha</a>
     <a href="/logout" class="nav-link active">logout</a>
     <a href="/chat" class="nav-link active"><i class="fa fa-comments" style="color: grey;" aria-hidden="true"></i></a>
+    <a href="/contact" class="nav-link active"><i class="fa fa-address-book" style="color: grey;" aria-hidden="true"></i></a>
     <div class="dropdown">
         <a href="#" class="dropbtn">
         <i class="fa fa-bell" style="color: grey;" aria-hidden="true"></i>
@@ -116,58 +109,25 @@ button{
     </form> -->
     <div id="matcha-chat">
         <div id="chat-window">
-            <div id="output"></div>
+            <div id="output">
+                <% if (pastMessages !== undefined /* && (typeof room  === pastMessages.destination) */) { %>
+                    <%pastMessages.forEach(results => { %>
+                        <p><strong><%=results.sender%></strong> <em><%=results.timeStamp%></em>: <%=results.message%></p>
+                    <% })%>
+                <% } %>
+            </div>
             <div id="feedback"></div>
         </div>
-        <input type="text" id="handle" placeholder="<%=data.firstName%> <%=data.lastName%>">
-        <input type="text" id="message" placeholder="Message">
-        <button id="send">Send</button>
+
+        <label for="message"><%=data.username%>:</label>
+        <input type="hidden" name="handle" id="handle" value="<%=(typeof data.username != "undefined" ? data.username : "")%>">
+        <input type="text" name="message" id="message" placeholder="Message">
+        <button type="submit" id="send">Send</button>
     </div>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qs/6.9.4/qs.min.js" integrity="sha256-ijqLssetA1NMNjZ+w1zaUafQQLm4IW5OoM8O+4tatME=" crossorigin="anonymous"></script>
+    <script src="/socket.io/socket.io.js"></script>
+    <script src="/js/chat.js"></script>
+    <script src="/js/notifications.js"></script>
 </section>
 
-<script src="/socket.io/socket.io.js"></script>
-<script src="https://code.jquery.com/jquery-3.5.1.min.js" integrity="sha256-9/aliU8dGd2tb6OSsuzixeV4y/faTqgFtohetphbbj0=" crossorigin="anonymous"></script>
-<script>
-  $(function () {
-    var socket = io();
-
-    // $('form').submit(function(){
-    //     socket.emit('chat message', $('#m').val());
-    //     $('#m').val('');
-    //     return false;
-    // });
-    
-    // socket.on('chat message', function(msg){
-    //     $('#messages').append($('<li>').text(msg));
-    //     window.scrollTo(0, document.body.scrollHeight);
-    // });
-
-    const handle = document.getElementById('handle');
-    const message = document.getElementById('message');
-    const sendBtn = document.getElementById('send');
-    const output = document.getElementById('output');
-    const feedback = document.getElementById('feedback')
-    
-    sendBtn.addEventListener('click', () => {
-        socket.emit('chat', {
-            messageData: message.value,
-            handleData: `${data.firstName} ${data.lastName}`
-        });
-    });
-
-    message.addEventListener('keypress', () => {
-        socket.emit('typing', {
-            handleData: `${data.firstName} ${data.lastName}`
-        });
-    });
-
-    socket.on('chat', (data) => {
-        output.innerHTML += `<p><strong>${data.firstName} ${data.lastName} </strong> : ${data.messageData}</p>`;
-    });
-
-    socket.on('typing', (data) => {
-        feedback.innerHTML = `<p><em>${data.handle} is typing...</em></p>`;
-    });
-  });
-</script>
 <%- include('../partials/footer');%>

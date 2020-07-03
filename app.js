@@ -4,11 +4,11 @@ const path = require('path');
 var mysql = require('mysql');
 const session = require('express-session');
 const MySQLStore = require('express-mysql-session')(session);
-const passport = require('passport');
 const TWO_HOURS = 1000 * 60 * 60 * 2;
 const app = express();
 const http = require('http').createServer(app);
 const io = require('socket.io')(http);
+const formatMessage = require('./utils/messages');
 
 
 const {
@@ -63,6 +63,7 @@ con.connect((err) => {
     var viewsSql = "CREATE TABLE IF NOT EXISTS views (id INT AUTO_INCREMENT PRIMARY KEY, viewer VARCHAR(255) NOT NULL, viewed VARCHAR(255) NOT NULL)";
     var notificationsSql = "CREATE TABLE IF NOT EXISTS notifications (id INT AUTO_INCREMENT PRIMARY KEY, notifyUser VARCHAR(255) NOT NULL, messages VARCHAR(255) NOT NULL)";
     var filterSql = "CREATE TABLE IF NOT EXISTS searchFilter (id INT AUTO_INCREMENT PRIMARY KEY, ageRange VARCHAR(255) NOT NULL, fameRange VARCHAR(255) NOT NULL, distanceRange VARCHAR(255) NOT NULL, ageSort VARCHAR(255) NOT NULL, distanceSort VARCHAR(255) NOT NULL, fameSort VARCHAR(255) NOT NULL, username VARCHAR(255) NOT NULL)";
+    var messageSql = "CREATE TABLE IF NOT EXISTS messages (id INT AUTO_INCREMENT PRIMARY KEY, sender VARCHAR(255) NOT NULL, message VARCHAR(255) NOT NULL, destination VARCHAR(255) NOT NULL, timeStamp VARCHAR(255) NOT NULL)";
     recon.query(userSql, function (err, result) {
       if (err) throw err;
       console.log("User Table created");
@@ -93,6 +94,11 @@ con.connect((err) => {
         console.log("notifications Table created");
     });
 
+    recon.query(messageSql, function (err, result) {
+        if (err) throw err;
+        console.log("Messages Table created");
+    });
+
     recon.query(filterSql, function (err, result) {
         if (err) throw err;
         console.log("searchFilter Table created");
@@ -110,7 +116,7 @@ app.set('views', path.join(__dirname, 'views'));
 ///////////////////////////////////////////////
 
 ///////////////////////////////////////////////
-//// SETTING UP A COOKIE AND PASSPORT MIDDLEWARE
+//// SETTING UP A COOKIE 
 app.set('trust proxy', 1); // trust first proxy
 app.use(session({
   name: SESS_NAME,
@@ -124,8 +130,6 @@ app.use(session({
       secure: IN_PROD
     }
 }));
-app.use(passport.initialize());
-app.use(passport.session());
 //////////////////////////////////////////////
 
 ///////////////////////////////////////////////
@@ -152,52 +156,61 @@ app.use(express.static(path.join(__dirname, 'public')));
 app.use(express.static(path.join(__dirname, '/node_modules/bootstrap/dist')));
 //////////////////////////////////////////////
 
-app.use((req, res, next) => {
-    res.locals.isAuthenticated = req.isAuthenticated();
-    next();
-});
-
 ///////////////////////////////////////////////////////
 ///// IMPORT ROUTES
 app.use('/api', getRoutes);
 app.use('/', index);
 ///////////////////////////////////////////////////////
 
+io.on('connect', (socket) => {
+    // console.log(`Connected...`);
 
+    const chatBot = 'nnilChat Bot';
+    socket.on('joinRoom', ({username, handle, room}) => {
+        socket.join(room);
+        console.log(username);
+        console.log(handle);
+        socket.emit('messageRoom', formatMessage(chatBot,`Welcome to ${room}!`));
+        socket.broadcast.to(room).emit('messageRoom', formatMessage(chatBot ,`${handle} has joined the chat`));
 
-//// Authentification and page restriction middleware
-// function authenticationMiddleware () {
-//     return (req, res, next) => {
-//         console.log(`
-//             req.session.passport.user: ${JSON.stringify(req.session.passport)}
-//         `);
-//         if (req.isAuthenticated()) return next();
+        socket.on('chat', (data) => {
+            console.log(data);
+            // io.sockets.emit('message', data);
+            // socket.broadcast.in(room).emit('message', formatMessage(data.handle ,data.message)); /// This broadcasts to all but self
+            recon.query(`INSERT INTO messages (sender, message, destination, timeStamp) VALUES (?, ?, ?, ?)`, [handle, data.message, room, moment().format('h:mm a')], (err, result) => {
+                if (err) throw err;
+                io.sockets.in(room).emit('messageRoom', formatMessage(data.handle ,data.message)); /// This broadcasts to all including self
+                recon.query(`INSERT INTO notifications (notifyUser, messages) VALUES (?, ?)`, [handle, data.message], (err, result) => {
+                    if (err) throw err;
+                    io.sockets.in(room).emit('notify', `${data.handle} sent a message in the chatroom`); /// This broadcasts to all including self
+                    console.log("1 record inserted");
+                });
+                console.log("1 record inserted");
+            });
+        });
 
-//         res.redirect('/login')
-//     }
-// }
-//////////////////////////////////////////
+        socket.on('disconnect', () => {
+            io.sockets.in(room).emit('messageRoom', formatMessage(chatBot, `${handle} has left the chat`));
+        });
+    });
 
-io.on('connection', (socket) => {
-    console.log('a user connected');
-    // console.log(socket);
     
-    // socket.on('chat message', (msg) => {
-    //     // console.log('message: ' + msg);
-    //     io.emit('chat message', `${msg}`);
-    // });
-    
-    // socket.on('disconnect', () => {
-    //     console.log('user disconnected');
-    // });
+
     socket.on('chat', (data) => {
-        io.sockets.emit('chat', data);
-        console.log(data);
+        // io.sockets.emit('message', data);
+        io.sockets.emit('message', formatMessage(data.handle ,data.message));
     });
 
     socket.on('typing', (data) => {
-        socket.broadcast.emit('typing', data);
-    })
+        socket.broadcast.emit('check', data);
+    });
+
+    // Broadcast when user connects
+
+    //Broadcast when user disconnects
+    // socket.on('disconnect', () => {
+    //     io.emit('message', formatMessage(chatBot, 'A user has left the chat'));
+    // });
 });
 
 http.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));

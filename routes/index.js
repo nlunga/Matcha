@@ -1,7 +1,6 @@
 const express = require('express');
 const router = express.Router();
 var mysql = require('mysql');
-const passport = require('passport');
 const bcrypt = require('bcrypt');
 const multer = require('multer');
 const nodemailer = require('nodemailer');
@@ -666,11 +665,13 @@ router.get('/view/:from/:to', redirectLogin, (req, res) => {
         }
     });
 
-    var notify = [];
-
-    user.notifications.forEach((item, index, array) => {
-        notify.push(item.messages);
-    });
+    if (user.notifications !== undefined) {
+        var notify = [];
+    
+        user.notifications.forEach((item, index, array) => {
+            notify.push(item.messages);
+        });
+    }
     
     res.render('pages/view-profile', {
         headed: `${toFirstName} ${toLastName}'s Profile`,
@@ -697,24 +698,58 @@ router.get('/chat', (req, res) => {
         userId.notifications.forEach((item, index, array) => {
             notify.push(item.messages);
         });
-        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+       
+        recon.query(`SELECT * FROM messages`, (err, result) => {
             if (err) throw err;
-           res.render('pages/chat_room', {
-               headed: 'Chat Room',
-               data: userId,
-               getNotified: notify
-           });
+            if (result.length === 0) {
+                res.render('pages/chat_room', {
+                    data: userId,
+                    headed: 'Chat Room',
+                    getNotified: notify,
+                    pastMessages: undefined
+                });
+            }else {
+                res.render('pages/chat_room', {
+                    data: userId,
+                    headed: 'Chat Room',
+                    getNotified: notify,
+                    pastMessages: result
+                });
+            }
         });
     }else {
-        recon.query(`SELECT * FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+        recon.query(`SELECT * FROM messages`, (err, result) => {
             if (err) throw err;
-           res.render('pages/chat_room', {
-               headed: 'Chat Room',
-               data: userId,
-               getNotified: undefined
-           });
+            if (result.length === 0) {
+                res.render('pages/chat_room', {
+                    data: userId,
+                    headed: 'Chat Room',
+                    getNotified: undefined,
+                    pastMessages: undefined
+                });
+            }else {
+                res.render('pages/chat_room', {
+                    data: userId,
+                    headed: 'Chat Room',
+                    getNotified: undefined,
+                    pastMessages: result
+                });
+            }
         });
     }
+});
+
+router.get('/contact', redirectLogin, (req, res) => {
+    userData = req.session;
+    recon.query(`SELECT firstName, lastName, username FROM users WHERE username != '${req.session.username}'`, (err, result) => {
+        if (err) throw err;
+        // console.log(result);
+        res.render('pages/contact', {
+            users: result,
+            data: userData,
+            headed: 'Contacts'
+        });
+    });
 });
 
 router.get('/reset-password', redirectDashboard, (req, res) => {
@@ -737,25 +772,6 @@ router.get('/dropdb', (req, res) => {
         if (err) throw err;
         res.send(`Database deleted...`);
     });
-});
-
-/* function authenticationMiddleware () {
-    return (req, res, next) => {
-        console.log(`
-        req.session.passport.user: ${JSON.stringify(req.session.passport)}
-        `);
-        if (req.isAuthenticated()) return next();
-        
-        res.redirect('/login')
-    }
-} */
-
-passport.serializeUser((user_id, done) => {
-    done(null, user_id);
-});
-  
-passport.deserializeUser((user_id, done) => {
-    done(null, user_id);
 });
 
 module.exports = router;
