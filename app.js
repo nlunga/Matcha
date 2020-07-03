@@ -180,16 +180,24 @@ app.use('/', index);
 
 io.on('connection', (socket) => {
     console.log('a user connected');
+    // console.log(socket);
     
-    socket.on('chat message', (msg) => {
-        // console.log('message: ' + msg);
-        io.emit('chat message', `${msg}`);
+    // socket.on('chat message', (msg) => {
+    //     // console.log('message: ' + msg);
+    //     io.emit('chat message', `${msg}`);
+    // });
+    
+    // socket.on('disconnect', () => {
+    //     console.log('user disconnected');
+    // });
+    socket.on('chat', (data) => {
+        io.sockets.emit('chat', data);
+        console.log(data);
     });
-    
-    socket.on('disconnect', () => {
-        console.log('user disconnected');
-    });
-    
+
+    socket.on('typing', (data) => {
+        socket.broadcast.emit('typing', data);
+    })
 });
 
 http.listen(PORT, () => console.log(`Example app listening on port ${PORT}!`));

@@ -186,8 +186,8 @@ router.post('/signup', redirectDashboard, (req, res) => {
                 secure: true,
                 service: 'gmail',
                 auth: {
-                    user: 'nlunga@student.wethinkcode.co.za',
-                    pass: '9876543210khulu'
+                    user: 'matchamanagment@gmail.com',
+                    pass: 'welcometomatcha'
                 },
                 tls: {
                     // do not fail on invalid certs
@@ -197,7 +197,7 @@ router.post('/signup', redirectDashboard, (req, res) => {
             // var emailToken = "jhdashghohwg2gwg";
             const conUrl = `http://localhost:3000/confirmation/${emailToken}`;
             const mailOptions = {
-                from: 'nlunga@student.wethinkcode.co.za',
+                from: 'matchamanagment@gmail.com',
                 to: req.body.email,
                 subject: 'Please Verify your email',
                 text: `That was easy!`,
