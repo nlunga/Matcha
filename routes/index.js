@@ -9,6 +9,7 @@ const saltRounds = 10;
 const emailToken = uuidv1();
 const path = require('path');
 const { userInfo } = require('os');
+const faker = require('faker');
 
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
@@ -354,12 +355,12 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                 if (result.length === 0) {
                                     res.render('pages/user-profile', {
                                         headed: "User Profile",
-                                        data: user
+                                        data: req.session
                                     });
                                 }else if (result[0].username !== req.session.username) {
                                     res.render('pages/user-profile', {
                                         headed: "User Profile",
-                                        data: user
+                                        data: req.session
                                     });
                                 }else {
                                     req.session.age = result[0].age;
@@ -502,17 +503,24 @@ router.get('/user-profile', redirectLogin, (req, res) => {
         }
     });
     const user = req.session;
-
-    var notify = [];
-    user.notifications.forEach((item, index, array) => {
-        notify.push(item.messages);
-    });
-
-    res.render('pages/user-profile', {
-        headed: "User Profile",
-        data: user,
-        getNotified: notify
-    });
+    if (user.notifications !== undefined){
+        var notify = [];
+        user.notifications.forEach((item, index, array) => {
+            notify.push(item.messages);
+        });
+    
+        res.render('pages/user-profile', {
+            headed: "User Profile",
+            data: user,
+            getNotified: notify
+        });
+    }else  {
+        res.render('pages/user-profile', {
+            headed: "User Profile",
+            data: user,
+            getNotified: undefined
+        });
+    }
 });
 
 router.post('/user-profile', (req, res) => {
@@ -756,6 +764,73 @@ router.get('/reset-password', redirectDashboard, (req, res) => {
     res.render('pages/reset-password', {
         headed: 'Reset Password'
     })
+});
+
+router.get('/get-started', (req, res) => {
+    for (let index = 0; index < 500; index++) {
+        if (index%2 !== 0) {
+            let named = faker.name.firstName('female');
+            let last = faker.name.lastName();
+            let usernamed = faker.internet.userName(`${named}_${last}`);
+            let daemail = faker.internet.email(named);
+            let passcode = 'Pass123@';
+            bcrypt.hash(passcode, saltRounds, (err, hash) => {
+                var confirmed = 1;
+                recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                });
+
+                recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                    return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
+                });
+            });
+        }else {
+            let named = faker.name.firstName('male');
+            let last = faker.name.lastName();
+            let usernamed = faker.internet.userName(`${named}_${last}`);
+            let daemail = faker.internet.email(named);
+            let passcode = 'Pass123@';
+
+            let age = 27;
+            let gender = 'Male';
+            let bio = faker.lorem.sentences(3, false);
+        
+            bcrypt.hash(passcode, saltRounds, (err, hash) => {
+                var confirmed = 1;
+                recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                });
+                if (idex >= 0 &&index <= 166){
+                    let sexualOrientation = 'Female';
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, username], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                        return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
+                    });
+                }else if (index > 166 && index <= 334){
+                    let sexualOrientation = 'Male';
+
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, username], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                        return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
+                    });
+                }else {
+                    let sexualOrientation = 'Both';
+
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, username], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                        return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
+                    });
+                }
+            });
+        } 
+    }
 });
 
 router.get('/createdb', (req, res) => {
