@@ -112,7 +112,8 @@ router.get('/index', (req, res) => {
 
 router.get('/dashboard', redirectLogin, (req, res) => {
     var userId = req.session;
-
+    // Margot_DAmore9
+    console.log(userId.otherImages);
     if (userId.notifications !== undefined) {
         var notify = [];
         userId.notifications.forEach((item, index, array) => {
@@ -285,15 +286,19 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                 }else {
                                     // var imageData = result[0].imagePath.split('./public');
                                     // req.session.otherImages = result;
-
+                                    
                                     result.forEach((item, index, array) => {
-                                        var images = result[index].imagePath.split('./public');
-                                        var obj = {
-                                            "id": result[index].id,
-                                            "imagePath": images[1],
-                                            "username": result[index].username
+                                        if ( result[index].imagePath.includes('./public') === true) {
+                                            var images = result[index].imagePath.split('./public');
+                                            var obj = {
+                                                "id": result[index].id,
+                                                "imagePath": images[1],
+                                                "username": result[index].username
+                                            }
+                                            req.session.otherImages.push(obj);
+                                        }else{
+                                            req.session.otherImages.push(result[index].imagePath);
                                         }
-                                        req.session.otherImages.push(obj);
                                     });
                                 }
                             });
