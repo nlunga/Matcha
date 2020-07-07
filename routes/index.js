@@ -112,8 +112,6 @@ router.get('/index', (req, res) => {
 
 router.get('/dashboard', redirectLogin, (req, res) => {
     var userId = req.session;
-    // Margot_DAmore9
-    console.log(userId.otherImages);
     if (userId.notifications !== undefined) {
         var notify = [];
         userId.notifications.forEach((item, index, array) => {
@@ -265,6 +263,7 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                             let user = req.session;
                             console.log('loggen in');
                             recon.query(`SELECT * FROM images WHERE username = ` + mysql.escape(result[0].username), (err, result) => {
+                                console.log(result);
                                 if (err) throw err;
                                 if (result.length === 0) {
                                     return console.log('Results not found');
@@ -273,6 +272,13 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                 }else {
                                     var imageData = result[0].imagePath.split('./public');
                                     req.session.image = imageData[1];
+
+                                    if ( result[0].imagePath.includes('./public') === true) {
+                                        var imageData = result[0].imagePath.split('./public');
+                                        req.session.image = imageData[1];
+                                    }else{
+                                        req.session.image = result[0].imagePath;
+                                    }
                                 }
                             });
 /////////////////////////////////////////// Other Users /////////////////////////////////////////////////////////////////////////////////
@@ -297,7 +303,12 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                             }
                                             req.session.otherImages.push(obj);
                                         }else{
-                                            req.session.otherImages.push(result[index].imagePath);
+                                            var obj = {
+                                                "id": result[index].id,
+                                                "imagePath": result[index].imagePath,
+                                                "username": result[index].username
+                                            }
+                                            req.session.otherImages.push(obj);
                                         }
                                     });
                                 }
@@ -405,6 +416,7 @@ router.get('/forgot_password', redirectDashboard, (req, res) => {
 
 router.get('/profile', redirectLogin, (req, res) => {
     const userData = req.session;
+    console.log(userData.image)
     if (userData.notifications !== undefined) {
         var notify = [];
         userData.notifications.forEach((item, index, array) => {
@@ -785,84 +797,65 @@ router.get('/get-started', (req, res) => {
             let bio = faker.lorem.sentences(3, false);
             let interests = 'traveling, exercise, dancing, doing stuff outdoors, politics, photography, sports';
 
-            let url = 'https://randomuser.me/api/?inc=picture&gender=female&result=1';
+            var age = 27;
+            
+            let imgUrl = "/user-avatar/female-avatar.png"
 
-            fetch(url)
-            .then(res => res.json())
-            .then((out) => {
-                let imgUrl = out.results[0].picture.large;
-                let age = out.results[0].dob.age;
-
-                bcrypt.hash(passcode, saltRounds, (err, hash) => {
-                    var confirmed = 1;
-                    recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
-                        if (err) throw err;
-                        console.log("1 record inserted");
-                    });
-                    if (index >= 0 &&index <= 166){
-                        let sexualOrientation = 'Female';
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
-
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
-
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted');
-                        });
-
-                    }else if (index > 166 && index <= 334){
-
-                        let sexualOrientation = 'Male';
-    
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
-
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
-
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted');
-                        });
-
-                    }else {
-
-                        let sexualOrientation = 'Both';
-    
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
-
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
-
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted')
-                        });
-
-                    }
-                });
-            })
-            .catch(err => { throw err });
-
-            /* bcrypt.hash(passcode, saltRounds, (err, hash) => {
+            bcrypt.hash(passcode, saltRounds, (err, hash) => {
                 var confirmed = 1;
                 recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
                     if (err) throw err;
                     console.log("1 record inserted");
                 });
+                if (index >= 0 &&index <= 166){
+                    let sexualOrientation = 'Female';
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
 
-                recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [req.body.age, req.body.gender, req.body.sexualOrientation, req.body.bio, req.body.interests, req.body.username], (err, result) => {
-                    if (err) throw err;
-                    console.log("1 record inserted");
-                    return res.redirect('/set-profilePic');// TODO set up an if statement to route to dashboard
-                });
-            }); */
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted');
+                    });
+
+                }else if (index > 166 && index <= 334){
+
+                    let sexualOrientation = 'Male';
+
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
+
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted');
+                    });
+
+                }else {
+
+                    let sexualOrientation = 'Both';
+
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
+
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted')
+                    });
+
+                }
+            });
+        
         }else {
             let named = faker.name.firstName('male');
             let last = faker.name.lastName();
@@ -870,90 +863,70 @@ router.get('/get-started', (req, res) => {
             let daemail = faker.internet.email(named);
             let passcode = 'Pass123@';
 
-            // let age = 27;
+            let age = 27;
             let gender = 'Male';
             let bio = faker.lorem.sentences(3, false);
             let interests = 'traveling, exercise, dancing, doing stuff outdoors, politics, photography, sports';
 
-            let url = 'https://randomuser.me/api/?inc=picture,dob&gender=male&result=1';
-
-            fetch(url)
-            .then(res => res.json())
-            .then((out) => {
-                let imgUrl = out.results[0].picture.large;
-                let age = out.results[0].dob.age;
-                bcrypt.hash(passcode, saltRounds, (err, hash) => {
-                    var confirmed = 1;
-                    recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
+            
+            let imgUrl ='/user-avatar/male-avatar.png';
+            
+            bcrypt.hash(passcode, saltRounds, (err, hash) => {
+                var confirmed = 1;
+                recon.query("INSERT INTO users (firstName, lastName, userName, email, password, verified, token) VALUES (?, ?, ?, ?, ?, ?, ?)", [named, last, usernamed, daemail, hash, confirmed, emailToken], (err, result) => {
+                    if (err) throw err;
+                    console.log("1 record inserted");
+                });
+                if (index >= 0 &&index <= 166){
+                    let sexualOrientation = 'Female';
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
                         if (err) throw err;
                         console.log("1 record inserted");
                     });
-                    if (index >= 0 &&index <= 166){
-                        let sexualOrientation = 'Female';
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
 
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
 
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted');
-                        });
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted');
+                    });
 
-                    }else if (index > 166 && index <= 334){
+                }else if (index > 166 && index <= 334){
 
-                        let sexualOrientation = 'Male';
-    
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
+                    let sexualOrientation = 'Male';
 
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
 
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted');
-                        });
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
 
-                    }else {
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted');
+                    });
 
-                        let sexualOrientation = 'Both';
-    
-                        recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log("1 record inserted");
-                        });
+                }else {
 
-                        const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
+                    let sexualOrientation = 'Both';
 
-                        recon.query(sql, [imgUrl, usernamed], (err, result) => {
-                            if (err) throw err;
-                            console.log('1 Document inserted')
-                        });
+                    recon.query("INSERT INTO userInfo (age, gender, sexualOrientation, bio, interest, username) VALUES (?, ?, ?, ?, ?, ?)", [age, gender, sexualOrientation, bio, interests, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log("1 record inserted");
+                    });
 
-                    }
-                });
-            })
-            .catch(err => { throw err });
+                    const sql = `INSERT INTO images(imagePath, username) VALUES (?, ?)`;
 
+                    recon.query(sql, [imgUrl, usernamed], (err, result) => {
+                        if (err) throw err;
+                        console.log('1 Document inserted')
+                    });
+
+                }
+            });
         } 
     }
-
-    // let url = 'https://randomuser.me/api/?inc=picture,dob&gender=male&result=1';
-    // let test = 'test'
-
-    // fetch(url)
-    // .then(res => res.json())
-    // .then((out) => {
-    //     console.log('Checkout this JSON! ', out.results[0].picture.large);
-    //     console.log('Checkout this JSON! ', out.results[0].dob.age);
-    //     var imgUrl = out.results[0].picture.large;
-    //     var age = out.results[0].dob.age;
-    // })
-    // .catch(err => { throw err });
 });
 
 router.get('/createdb', (req, res) => {
