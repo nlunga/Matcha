@@ -111,6 +111,89 @@ router.get('/index', (req, res) => {
 });
 
 router.get('/dashboard', redirectLogin, (req, res) => {
+    
+/////////////////////////////////////////// Other Users /////////////////////////////////////////////////////////////////////////////////
+
+    req.session.otherImages = [];
+    
+    /* recon.query(`SELECT * FROM images WHERE username NOT IN (SELECT DISTINCT if('${req.session.sexualOrientation}'='both', '*', '${req.session.sexualOrientation}')username FROM userinfo}') `, (err, result) => {
+    }); */
+    recon.query(`SELECT * FROM images WHERE username NOT IN (SELECT DISTINCT username FROM userinfo WHERE gender != '${req.session.sexualOrientation}') `, (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            return console.log('Results not found');
+        }else {
+            result.forEach((item, index, array) => {
+                if ( result[index].imagePath.includes('./public') === true) {
+                    var images = result[index].imagePath.split('./public');
+                    var obj = {
+                        "id": result[index].id,
+                        "imagePath": images[1],
+                        "username": result[index].username
+                    }
+                    req.session.otherImages.push(obj);
+                }else{
+                    var obj = {
+                        "id": result[index].id,
+                        "imagePath": result[index].imagePath,
+                        "username": result[index].username
+                    }
+                    req.session.otherImages.push(obj);
+                }
+            });
+        }
+    });
+
+    req.session.otherUser = [];
+    recon.query(`SELECT * FROM userInfo WHERE username NOT IN (SELECT DISTINCT username FROM userinfo WHERE gender != '${req.session.sexualOrientation}')`, (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            return console.log('Results not found');
+        }else {
+            result.forEach((item, index, array) => {
+                var obj = {
+                    "otherAge": result[index].age,
+                    "otherGender": result[index].gender,
+                    "otherSexualOrientation": result[index].sexualOrientation,
+                    "otherBio": result[index].bio,
+                    "otherInterest": result[index].interest,
+                    "otherUsername": result[index].username
+                }
+                req.session.otherUser.push(obj);
+            });
+        }
+    });
+
+    req.session.peopleNames = [];
+    
+    recon.query(`SELECT * FROM users WHERE username NOT IN (SELECT DISTINCT username FROM userinfo WHERE gender != '${req.session.sexualOrientation}')`, (err, result) => {
+        if (err) throw err;
+        if (result.length === 0) {
+            return console.log('Results not found');
+        }else {
+            result.forEach((item, index, array) => {
+                var other = {
+                    "otherFirstName": result[index].firstName,
+                    "otherLastName": result[index].lastName,
+                    "otherUserUsername": result[index].username
+                }
+                req.session.peopleNames.push(other);
+            });
+        }
+    });
+
+    recon.query(`SELECT notifyUser, messages FROM notifications WHERE notifyUser = '${req.session.username}'`, (err, result) => {
+        if (err) throw err;
+        console.log(result);
+        if (result.length === 0) {
+            return console.log('Results not found');
+        }else {
+            req.session.notifications = result;
+        }
+    });
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
     var userId = req.session;
     if (userId.notifications !== undefined) {
         var notify = [];
@@ -281,92 +364,7 @@ router.post('/login', redirectDashboard/*, redirectUserProfile*/, (req, res) => 
                                     }
                                 }
                             });
-/////////////////////////////////////////// Other Users /////////////////////////////////////////////////////////////////////////////////
 
-                            req.session.otherImages = [];
-                            
-                            recon.query(`SELECT * FROM images WHERE username != ` + mysql.escape(result[0].username), (err, result) => {
-                                if (err) throw err;
-                                if (result.length === 0) {
-                                    return console.log('Results not found');
-                                }else {
-                                    // var imageData = result[0].imagePath.split('./public');
-                                    // req.session.otherImages = result;
-                                    
-                                    result.forEach((item, index, array) => {
-                                        if ( result[index].imagePath.includes('./public') === true) {
-                                            var images = result[index].imagePath.split('./public');
-                                            var obj = {
-                                                "id": result[index].id,
-                                                "imagePath": images[1],
-                                                "username": result[index].username
-                                            }
-                                            req.session.otherImages.push(obj);
-                                        }else{
-                                            var obj = {
-                                                "id": result[index].id,
-                                                "imagePath": result[index].imagePath,
-                                                "username": result[index].username
-                                            }
-                                            req.session.otherImages.push(obj);
-                                        }
-                                    });
-                                }
-                            });
-
-                            req.session.otherUser = [];
-
-                            recon.query(`SELECT * FROM userInfo WHERE username != ` + mysql.escape(result[0].username) , (err, result) => {
-                                if (err) throw err;
-                                if (result.length === 0) {
-                                    return console.log('Results not found');
-                                }else {
-                                    // req.session.otherUser = [];
-                                    result.forEach((item, index, array) => {
-                                        var obj = {
-                                            "otherAge": result[index].age,
-                                            "otherGender": result[index].gender,
-                                            "otherSexualOrientation": result[index].sexualOrientation,
-                                            "otherBio": result[index].bio,
-                                            "otherInterest": result[index].interest,
-                                            "otherUsername": result[index].username
-                                        }
-                                        req.session.otherUser.push(obj);
-                                    });
-                                }
-                            });
-
-                            req.session.peopleNames = [];
-
-                            recon.query(`SELECT * FROM users WHERE username != ` + mysql.escape(result[0].username) , (err, result) => {
-                                if (err) throw err;
-                                if (result.length === 0) {
-                                    return console.log('Results not found');
-                                }else {
-                                    result.forEach((item, index, array) => {
-                                        var other = {
-                                            "otherFirstName": result[index].firstName,
-                                            "otherLastName": result[index].lastName,
-                                            "otherUserUsername": result[index].username
-                                        }
-                                        req.session.peopleNames.push(other);
-                                    });
-                                }
-                            });
-
-                            recon.query(`SELECT notifyUser, messages FROM notifications WHERE notifyUser = ` + mysql.escape(result[0].username) , (err, result) => {
-                                if (err) throw err;
-                                console.log(result);
-                                if (result.length === 0) {
-                                    return console.log('Results not found');
-                                }else {
-                                    // result.forEach((item, index, array) => {
-                                    //     console.log(item);
-                                    // });
-                                    req.session.notifications = result;
-                                }
-                            });
-////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
                             recon.query(`SELECT * FROM userInfo WHERE username = ` + mysql.escape(result[0].username) + `LIMIT 1`, (err, result) => {
                                 if (err) throw err;
                                 if (result.length === 0) {
